@@ -14,16 +14,23 @@ export default function App() {
   const [carrinho, setCarrinho] = useState([]);
   const [busca, setBusca] = useState("");
 
-  // 🔥 CARREGAR DADOS DO BACKEND
+  const [carregado, setCarregado] = useState(false);
+
+  // 🔥 CARREGAR DADOS
   useEffect(() => {
     const carregar = async () => {
       try {
-        const res = await fetch(API + "/dados");
+        const res = await fetch(`${API}/dados`);
+
+        if (!res.ok) return;
+
         const dados = await res.json();
 
-        setProdutos(dados.produtos || []);
-        setVendas(dados.vendas || []);
-        setPendentes(dados.pendentes || []);
+        setProdutos(dados?.produtos || []);
+        setVendas(dados?.vendas || []);
+        setPendentes(dados?.pendentes || []);
+
+        setCarregado(true);
       } catch (err) {
         console.log("Erro ao carregar:", err);
       }
@@ -32,11 +39,13 @@ export default function App() {
     carregar();
   }, []);
 
-  // 🔥 SALVAR AUTOMATICO
+  // 🔥 SALVAR (SÓ DEPOIS DE CARREGAR)
   useEffect(() => {
+    if (!carregado) return;
+
     const salvar = async () => {
       try {
-        await fetch(API + "/dados", {
+        await fetch(`${API}/dados`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -51,7 +60,7 @@ export default function App() {
     };
 
     salvar();
-  }, [produtos, vendas, pendentes]);
+  }, [produtos, vendas, pendentes, carregado]);
 
   // PRODUTOS
   const adicionarProduto = () => {
@@ -73,7 +82,7 @@ export default function App() {
   };
 
   const produto = produtos.find(p =>
-    p.nome.toLowerCase().includes(busca.toLowerCase())
+    p.nome?.toLowerCase().includes(busca.toLowerCase())
   );
 
   const addCarrinho = () => {
@@ -100,7 +109,7 @@ export default function App() {
       {
         itens: carrinho,
         total: totalCarrinho,
-        data: new Date()
+        data: new Date().toISOString()
       }
     ]);
 
@@ -113,9 +122,9 @@ export default function App() {
 
       <h2>Produtos</h2>
 
-      <input placeholder="Nome" value={nome} onChange={e=>setNome(e.target.value)} />
-      <input placeholder="Preço" value={preco} onChange={e=>setPreco(e.target.value)} />
-      <input placeholder="Estoque" value={estoque} onChange={e=>setEstoque(e.target.value)} />
+      <input placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} />
+      <input placeholder="Preço" value={preco} onChange={e => setPreco(e.target.value)} />
+      <input placeholder="Estoque" value={estoque} onChange={e => setEstoque(e.target.value)} />
 
       <button onClick={adicionarProduto}>Salvar</button>
 
@@ -132,7 +141,7 @@ export default function App() {
       <input
         placeholder="Buscar produto"
         value={busca}
-        onChange={e=>setBusca(e.target.value)}
+        onChange={e => setBusca(e.target.value)}
       />
 
       {produto && (
