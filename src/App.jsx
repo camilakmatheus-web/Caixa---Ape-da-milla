@@ -103,20 +103,21 @@ export default function App() {
           </div>
 
           <button style={styles.button} onClick={adicionarProduto}>
-            + Adicionar
+            + Adicionar Produto
           </button>
 
           <div style={styles.list}>
             {produtos.map(p => (
               <div key={p.id} style={styles.item}>
-                <b>{p.nome}</b> — R$ {p.preco} | estoque: {p.estoque}
+                <b>{p.nome}</b>
+                <span>R$ {p.preco} | estoque: {p.estoque}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* CAIXA */}
-        <div style={styles.card}>
+        <div style={styles.cardAccent}>
           <h2>🛒 Caixa</h2>
 
           <input
@@ -128,8 +129,10 @@ export default function App() {
 
           {produto && (
             <div style={styles.result}>
-              {produto.nome} — R$ {produto.preco}
-              <button style={styles.smallBtn} onClick={addCarrinho}>Adicionar</button>
+              <span>{produto.nome} — R$ {produto.preco}</span>
+              <button style={styles.smallBtn} onClick={addCarrinho}>
+                Adicionar
+              </button>
             </div>
           )}
 
@@ -147,11 +150,11 @@ export default function App() {
 
 const styles = {
   page: {
-    background: "#0f172a",
     minHeight: "100vh",
     padding: 20,
+    fontFamily: "Arial",
     color: "#fff",
-    fontFamily: "Arial"
+    background: "linear-gradient(135deg, #0f172a, #1e293b)"
   },
   container: {
     maxWidth: 900,
@@ -159,14 +162,24 @@ const styles = {
   },
   title: {
     textAlign: "center",
-    marginBottom: 20
+    marginBottom: 25,
+    fontSize: 32
   },
   card: {
-    background: "#1e293b",
+    background: "rgba(30, 41, 59, 0.85)",
     padding: 20,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 20,
-    boxShadow: "0 10px 25px rgba(0,0,0,0.3)"
+    boxShadow: "0 12px 30px rgba(0,0,0,0.4)",
+    backdropFilter: "blur(10px)"
+  },
+  cardAccent: {
+    background: "rgba(15, 23, 42, 0.95)",
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 20,
+    boxShadow: "0 12px 30px rgba(0,0,0,0.5)",
+    border: "1px solid #334155"
   },
   row: {
     display: "flex",
@@ -176,52 +189,60 @@ const styles = {
   input: {
     flex: 1,
     padding: 10,
-    borderRadius: 8,
-    border: "none"
+    borderRadius: 10,
+    border: "none",
+    outline: "none"
   },
   inputFull: {
     width: "100%",
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 10
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 10,
+    border: "none",
+    outline: "none"
   },
   button: {
     padding: 10,
     background: "#3b82f6",
     border: "none",
     color: "#fff",
-    borderRadius: 8,
-    cursor: "pointer"
+    borderRadius: 10,
+    cursor: "pointer",
+    marginTop: 5
   },
   buttonGreen: {
-    padding: 10,
+    padding: 12,
     background: "#22c55e",
     border: "none",
     color: "#fff",
-    borderRadius: 8,
+    borderRadius: 10,
     cursor: "pointer",
-    width: "100%"
+    width: "100%",
+    fontWeight: "bold"
   },
   list: {
     marginTop: 10
   },
   item: {
-    padding: 8,
-    borderBottom: "1px solid #334155"
+    padding: 10,
+    borderBottom: "1px solid #334155",
+    display: "flex",
+    justifyContent: "space-between"
   },
   result: {
     margin: "10px 0",
-    padding: 10,
+    padding: 12,
     background: "#334155",
-    borderRadius: 8,
+    borderRadius: 10,
     display: "flex",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   smallBtn: {
     background: "#f59e0b",
     border: "none",
-    padding: "5px 10px",
-    borderRadius: 6,
+    padding: "6px 12px",
+    borderRadius: 8,
     cursor: "pointer"
   }
 };
