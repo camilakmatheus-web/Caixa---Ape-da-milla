@@ -1,67 +1,88 @@
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// ================= BANCO SIMPLES (DEMO) =================
-let db = [];
+// ================= CONFIG =================
+const SECRETO = "segredo_super_forte_123";
 
-// ================= FUNÇÃO PEGAR USUÁRIO =================
-function getUser(userId) {
-  let user = db.find(u => u.userId === userId);
+// ================= MONGODB =================
+mongoose.connect(process.env.MONGO_URL)
+  .then(() => console.log("MongoDB conectado"))
+  .catch(err => console.log(err));
 
-  if (!user) {
-    user = {
-      userId,
+// ================= MODELOS =================
+const User = mongoose.model("User", {
+  email: String,
+  senha: String
+});
+
+const Caixa = mongoose.model("Caixa", {
+  userId: String,
+  produtos: Array,
+  vendas: Array,
+  pendentes: Array
+});
+
+// ================= AUTH =================
+function auth(req, res, next) {
+  const token = req.headers.authorization;
+
+  if (!token) return res.status(401).send("Sem token");
+
+  try {
+    const decoded = jwt.verify(token, SECRETO);
+    req.userId = decoded.id;
+    next();
+  } catch (err) {
+    return res.status(401).send("Token inválido");
+  }
+}
+
+// ================= PEGAR DADOS =================
+app.get("/dados", auth, async (req, res) => {
+  let caixa = await Caixa.findOne({ userId: req.userId });
+
+  if (!caixa) {
+    caixa = await Caixa.create({
+      userId: req.userId,
       produtos: [],
       vendas: [],
       pendentes: []
-    };
-    db.push(user);
+    });
   }
 
-  return user;
-}
-
-// ================= GET DADOS =================
-app.get("/dados", (req, res) => {
-  const userId = req.headers.authorization;
-
-  if (!userId) return res.status(401).json({ error: "sem user" });
-
-  const user = getUser(userId);
-
-  res.json(user);
+  res.json(caixa);
 });
 
 // ================= SALVAR DADOS =================
-app.post("/dados", (req, res) => {
-  const userId = req.headers.authorization;
+app.post("/dados", auth, async (req, res) => {
+  const { produtos, vendas, pendentes } = req.body;
 
-  if (!userId) return res.status(401).json({ error: "sem user" });
-
-  const user = getUser(userId);
-
-  user.produtos = req.body.produtos || [];
-  user.vendas = req.body.vendas || [];
-  user.pendentes = req.body.pendentes || [];
+  await Caixa.findOneAndUpdate(
+    { userId: req.userId },
+    { produtos, vendas, pendentes },
+    { upsert: true }
+  );
 
   res.json({ ok: true });
 });
 
-// ================= RESET DIÁRIO (opcional futuro) =================
-app.post("/reset", (req, res) => {
-  const userId = req.headers.authorization;
+// ================= LOGIN SIMPLES (BASE) =================
+app.post("/login", async (req, res) => {
+  const { email } = req.body;
 
-  const user = getUser(userId);
-  user.vendas = [];
+  const token = jwt.sign({ id: email }, SECRETO);
 
-  res.json({ ok: true });
+  res.json({ token });
 });
 
 // ================= START =================
 app.listen(3000, () => {
-  console.log("MAGNUS BACKEND rodando na porta 3000");
+  console.log("MAGNUS rodando na porta 3000");
 });
