@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
+import { auth, provider } from "./firebase";
+import { signInWithPopup, signOut } from "firebase/auth";
 
 const API = "https://caixa-ape-da-milla.onrender.com";
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [user, setUser] = useState(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +22,7 @@ export default function App() {
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
 
-  // ================= LOGIN =================
+  // ================= LOGIN NORMAL =================
   const login = async () => {
     const res = await fetch(API + "/login", {
       method: "POST",
@@ -41,6 +44,18 @@ export default function App() {
     });
 
     alert("Conta criada");
+  };
+
+  // ================= LOGIN GOOGLE =================
+  const loginGoogle = async () => {
+    const res = await signInWithPopup(auth, provider);
+    const user = res.user;
+
+    // aqui você pode futuramente mandar pro backend
+    setUser(user);
+
+    // simula login (até integrar backend)
+    setToken("google-logado");
   };
 
   // ================= CARREGAR =================
@@ -137,6 +152,13 @@ export default function App() {
 
         <button onClick={login}>Entrar</button>
         <button onClick={register}>Criar conta</button>
+
+        <hr />
+
+        {/* LOGIN GOOGLE */}
+        <button onClick={loginGoogle}>
+          🔐 Entrar com Google
+        </button>
       </div>
     );
   }
@@ -146,9 +168,13 @@ export default function App() {
     <div style={{ padding: 20, fontFamily: "Arial" }}>
       <h1>💰 Sistema Caixa</h1>
 
+      {user && <p>👤 {user.displayName}</p>}
+
       <button onClick={() => {
         localStorage.removeItem("token");
         setToken("");
+        setUser(null);
+        signOut(auth);
       }}>
         Sair
       </button>
