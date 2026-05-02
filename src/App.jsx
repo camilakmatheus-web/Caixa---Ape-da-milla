@@ -92,7 +92,6 @@ export default function App() {
 
         <h1 style={styles.title}>💰 Apé da Milla</h1>
 
-        {/* PRODUTOS */}
         <div style={styles.card}>
           <h2>📦 Produtos</h2>
 
@@ -116,7 +115,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* CAIXA */}
         <div style={styles.cardAccent}>
           <h2>🛒 Caixa</h2>
 
@@ -154,17 +152,22 @@ const styles = {
     padding: 20,
     fontFamily: "Arial",
     color: "#fff",
-    background: "linear-gradient(135deg, #0f172a, #1e293b)"
+
+    // 🔥 FUNDO LARANJA
+    background: "linear-gradient(135deg, #ff7a18, #ffb347)"
   },
+
   container: {
     maxWidth: 900,
     margin: "0 auto"
   },
+
   title: {
     textAlign: "center",
     marginBottom: 25,
     fontSize: 32
   },
+
   card: {
     background: "rgba(30, 41, 59, 0.85)",
     padding: 20,
@@ -173,6 +176,7 @@ const styles = {
     boxShadow: "0 12px 30px rgba(0,0,0,0.4)",
     backdropFilter: "blur(10px)"
   },
+
   cardAccent: {
     background: "rgba(15, 23, 42, 0.95)",
     padding: 20,
@@ -181,11 +185,13 @@ const styles = {
     boxShadow: "0 12px 30px rgba(0,0,0,0.5)",
     border: "1px solid #334155"
   },
+
   row: {
     display: "flex",
     gap: 10,
     marginBottom: 10
   },
+
   input: {
     flex: 1,
     padding: 10,
@@ -193,6 +199,7 @@ const styles = {
     border: "none",
     outline: "none"
   },
+
   inputFull: {
     width: "100%",
     padding: 12,
@@ -201,6 +208,7 @@ const styles = {
     border: "none",
     outline: "none"
   },
+
   button: {
     padding: 10,
     background: "#3b82f6",
@@ -210,6 +218,7 @@ const styles = {
     cursor: "pointer",
     marginTop: 5
   },
+
   buttonGreen: {
     padding: 12,
     background: "#22c55e",
@@ -220,15 +229,18 @@ const styles = {
     width: "100%",
     fontWeight: "bold"
   },
+
   list: {
     marginTop: 10
   },
+
   item: {
     padding: 10,
     borderBottom: "1px solid #334155",
     display: "flex",
     justifyContent: "space-between"
   },
+
   result: {
     margin: "10px 0",
     padding: 12,
@@ -238,6 +250,7 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center"
   },
+
   smallBtn: {
     background: "#f59e0b",
     border: "none",
