@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
@@ -12,7 +13,10 @@ app.use(express.json());
 const SECRET = "segredo_super_forte_123";
 
 // 📦 MONGODB
-mongoose.connect(process.env.MONGO_URL || "mongodb+srv://apedamila:92533911@cluster0.fyggn20.mongodb.net/caixa?retryWrites=true&w=majority")
+mongoose.connect(
+  process.env.MONGO_URL ||
+    "mongodb+srv://apedamila:92533911@cluster0.fyggn20.mongodb.net/caixa?retryWrites=true&w=majority"
+)
   .then(() => console.log("MongoDB conectado"))
   .catch(err => console.log(err));
 
@@ -29,7 +33,7 @@ const Caixa = mongoose.model("Caixa", {
   pendentes: Array
 });
 
-// ================= MIDDLEWARE =================
+// ================= AUTH MIDDLEWARE =================
 function auth(req, res, next) {
   const token = req.headers.authorization;
 
@@ -39,12 +43,12 @@ function auth(req, res, next) {
     const decoded = jwt.verify(token, SECRET);
     req.userId = decoded.id;
     next();
-  } catch {
+  } catch (err) {
     return res.status(401).send("Token inválido");
   }
 }
 
-// ================= AUTH =================
+// ================= REGISTER =================
 app.post("/register", async (req, res) => {
   const { email, password } = req.body;
 
@@ -55,6 +59,7 @@ app.post("/register", async (req, res) => {
   res.json({ ok: true });
 });
 
+// ================= LOGIN =================
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -71,7 +76,7 @@ app.post("/login", async (req, res) => {
   res.json({ token });
 });
 
-// ================= DADOS =================
+// ================= GET DADOS =================
 app.get("/dados", auth, async (req, res) => {
   let dados = await Caixa.findOne({ userId: req.userId });
 
@@ -87,11 +92,20 @@ app.get("/dados", auth, async (req, res) => {
   res.json(dados);
 });
 
+// ================= SAVE DADOS (FIXADO) =================
 app.post("/dados", auth, async (req, res) => {
+  const { produtos, vendas, pendentes } = req.body;
+
   await Caixa.findOneAndUpdate(
     { userId: req.userId },
-    req.body,
-    { upsert: true }
+    {
+      $set: {
+        produtos: produtos || [],
+        vendas: vendas || [],
+        pendentes: pendentes || []
+      }
+    },
+    { upsert: true, new: true }
   );
 
   res.json({ ok: true });
@@ -99,4 +113,7 @@ app.post("/dados", auth, async (req, res) => {
 
 // ================= START =================
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log("Backend rodando na porta", PORT));
+
+app.listen(PORT, () => {
+  console.log("Backend MAGNUS rodando na porta", PORT);
+});

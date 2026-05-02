@@ -1,12 +1,9 @@
 import { useState, useEffect } from "react";
-import { auth, provider } from "./firebase";
-import { signInWithPopup, signOut } from "firebase/auth";
 
 const API = "https://caixa-ape-da-milla.onrender.com";
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
-  const [user, setUser] = useState(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +19,7 @@ export default function App() {
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
 
-  // ================= LOGIN NORMAL =================
+  // ================= LOGIN =================
   const login = async () => {
     const res = await fetch(API + "/login", {
       method: "POST",
@@ -46,15 +43,9 @@ export default function App() {
     alert("Conta criada");
   };
 
-  // ================= LOGIN GOOGLE REAL =================
-  const loginGoogle = async () => {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-
-    setUser(user);
-    setToken(user.uid);
-
-    localStorage.setItem("token", user.uid);
+  // ❌ LOGIN GOOGLE REMOVIDO (INCOMPATÍVEL COM BACKEND ATUAL)
+  const loginGoogle = () => {
+    alert("Use login normal (Google será integrado depois com Firebase Auth ID Token)");
   };
 
   // ================= CARREGAR =================
@@ -90,8 +81,8 @@ export default function App() {
   const adicionarProduto = () => {
     if (!nome || !preco || !estoque) return;
 
-    setProdutos([
-      ...produtos,
+    setProdutos(prev => [
+      ...prev,
       {
         id: Date.now(),
         nome,
@@ -112,13 +103,15 @@ export default function App() {
   const addCarrinho = () => {
     if (!produto || produto.estoque <= 0) return;
 
-    setCarrinho([...carrinho, produto]);
+    setCarrinho(prev => [...prev, { ...produto }]);
 
-    setProdutos(produtos.map(p =>
-      p.id === produto.id
-        ? { ...p, estoque: p.estoque - 1 }
-        : p
-    ));
+    setProdutos(prev =>
+      prev.map(p =>
+        p.id === produto.id
+          ? { ...p, estoque: p.estoque - 1 }
+          : p
+      )
+    );
 
     setBusca("");
   };
@@ -128,8 +121,8 @@ export default function App() {
   const finalizar = () => {
     if (!carrinho.length) return;
 
-    setVendas([
-      ...vendas,
+    setVendas(prev => [
+      ...prev,
       {
         itens: carrinho,
         total,
@@ -155,7 +148,7 @@ export default function App() {
         <hr />
 
         <button onClick={loginGoogle}>
-          🔐 Entrar com Google
+          🔐 Entrar com Google (em breve)
         </button>
       </div>
     );
@@ -166,13 +159,9 @@ export default function App() {
     <div style={{ padding: 20, fontFamily: "Arial" }}>
       <h1>💰 Sistema Caixa</h1>
 
-      {user && <p>👤 {user.displayName}</p>}
-
       <button onClick={() => {
-        signOut(auth);
         localStorage.removeItem("token");
         setToken("");
-        setUser(null);
       }}>
         Sair
       </button>
