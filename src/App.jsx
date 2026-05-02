@@ -7,6 +7,7 @@ const API = "https://caixa-ape-da-milla.onrender.com";
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [user, setUser] = useState(null);
+  const [tab, setTab] = useState("vendas");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +23,7 @@ export default function App() {
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
 
-  // ================= LOGIN EMAIL =================
+  // ================= LOGIN =================
   const login = async () => {
     const res = await fetch(API + "/login", {
       method: "POST",
@@ -31,7 +32,6 @@ export default function App() {
     });
 
     const data = await res.json();
-
     localStorage.setItem("token", data.token);
     setToken(data.token);
   };
@@ -46,12 +46,11 @@ export default function App() {
     alert("Conta criada");
   };
 
-  // ================= LOGIN GOOGLE (CORRETO) =================
+  // ================= GOOGLE LOGIN =================
   const loginGoogle = async () => {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    // 🔥 token REAL do Firebase (IMPORTANTE)
     const idToken = await user.getIdToken();
 
     setUser(user);
@@ -59,7 +58,7 @@ export default function App() {
     localStorage.setItem("token", idToken);
   };
 
-  // ================= CARREGAR =================
+  // ================= LOAD =================
   useEffect(() => {
     if (!token) return;
 
@@ -74,7 +73,7 @@ export default function App() {
       });
   }, [token]);
 
-  // ================= SALVAR (CORRIGIDO - ESTÁVEL) =================
+  // ================= SAVE =================
   useEffect(() => {
     if (!token) return;
 
@@ -98,12 +97,7 @@ export default function App() {
 
     setProdutos(prev => [
       ...prev,
-      {
-        id: Date.now(),
-        nome,
-        preco: Number(preco),
-        estoque: Number(estoque)
-      }
+      { id: Date.now(), nome, preco: Number(preco), estoque: Number(estoque) }
     ]);
 
     setNome("");
@@ -148,11 +142,11 @@ export default function App() {
     setCarrinho([]);
   };
 
-  // ================= LOGIN SCREEN =================
+  // ================= LOGIN =================
   if (!token) {
     return (
       <div style={{ padding: 20 }}>
-        <h2>Login</h2>
+        <h2>MAGNUS Login</h2>
 
         <input placeholder="email" onChange={e => setEmail(e.target.value)} />
         <input placeholder="senha" type="password" onChange={e => setPassword(e.target.value)} />
@@ -162,63 +156,102 @@ export default function App() {
 
         <hr />
 
-        <button onClick={loginGoogle}>
-          🔐 Entrar com Google
-        </button>
+        <button onClick={loginGoogle}>🔐 Entrar com Google</button>
       </div>
     );
   }
 
-  // ================= APP =================
+  // ================= SISTEMA =================
   return (
-    <div style={{ padding: 20, fontFamily: "Arial" }}>
-      <h1>💰 Sistema Caixa</h1>
+    <div style={{ display: "flex", fontFamily: "Arial" }}>
 
-      {user && <p>👤 {user.displayName}</p>}
+      {/* MENU */}
+      <div style={{
+        width: 220,
+        minHeight: "100vh",
+        background: "#0f0f1a",
+        color: "#fff",
+        padding: 20
+      }}>
+        <h2 style={{ color: "#a855f7" }}>MAGNUS</h2>
 
-      <button
-        onClick={() => {
+        <button onClick={() => setTab("vendas")}>Vendas</button>
+        <button onClick={() => setTab("produtos")}>Produtos</button>
+        <button onClick={() => setTab("pendentes")}>Pendentes</button>
+        <button onClick={() => setTab("stats")}>Estatísticas</button>
+        <button onClick={() => setTab("extrato")}>Extrato</button>
+
+        <hr />
+
+        <button onClick={() => {
           signOut(auth);
           localStorage.removeItem("token");
           setToken("");
-          setUser(null);
-        }}
-      >
-        Sair
-      </button>
+        }}>
+          Sair
+        </button>
+      </div>
 
-      <hr />
+      {/* CONTEÚDO */}
+      <div style={{ flex: 1, padding: 20 }}>
 
-      <h2>Produtos</h2>
+        <h1>💰 MAGNUS</h1>
+        {user && <p>👤 {user.displayName}</p>}
 
-      <input placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} />
-      <input placeholder="Preço" value={preco} onChange={e => setPreco(e.target.value)} />
-      <input placeholder="Estoque" value={estoque} onChange={e => setEstoque(e.target.value)} />
+        {/* ================= VENDAS ================= */}
+        {tab === "vendas" && (
+          <div>
+            <h2>Vendas</h2>
 
-      <button onClick={adicionarProduto}>Adicionar</button>
+            <input placeholder="Buscar produto" value={busca} onChange={e => setBusca(e.target.value)} />
 
-      {produtos.map(p => (
-        <div key={p.id}>
-          {p.nome} - R$ {p.preco} ({p.estoque})
-        </div>
-      ))}
+            {produto && (
+              <div>
+                {produto.nome} - R$ {produto.preco}
+                <button onClick={addCarrinho}>Adicionar</button>
+              </div>
+            )}
 
-      <hr />
+            <h3>Total: R$ {total.toFixed(2)}</h3>
 
-      <h2>Caixa</h2>
+            <button onClick={finalizar}>Finalizar venda</button>
 
-      <input placeholder="Buscar" value={busca} onChange={e => setBusca(e.target.value)} />
+            <hr />
 
-      {produto && (
-        <div>
-          {produto.nome} - R$ {produto.preco}
-          <button onClick={addCarrinho}>Adicionar</button>
-        </div>
-      )}
+            <h3>Histórico</h3>
+            {vendas.map((v, i) => (
+              <div key={i}>
+                💰 R$ {v.total} - {v.data}
+              </div>
+            ))}
+          </div>
+        )}
 
-      <h3>Total: R$ {total.toFixed(2)}</h3>
+        {/* ================= PRODUTOS ================= */}
+        {tab === "produtos" && (
+          <div>
+            <h2>Produtos</h2>
 
-      <button onClick={finalizar}>Finalizar</button>
+            <input placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} />
+            <input placeholder="Preço" value={preco} onChange={e => setPreco(e.target.value)} />
+            <input placeholder="Estoque" value={estoque} onChange={e => setEstoque(e.target.value)} />
+
+            <button onClick={adicionarProduto}>Adicionar</button>
+
+            {produtos.map(p => (
+              <div key={p.id}>
+                {p.nome} - R$ {p.preco} ({p.estoque})
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ================= OUTRAS ABAS (BASE) ================= */}
+        {tab === "pendentes" && <h2>Pendentes (em construção)</h2>}
+        {tab === "stats" && <h2>Estatísticas (em construção)</h2>}
+        {tab === "extrato" && <h2>Extrato (em construção)</h2>}
+
+      </div>
     </div>
   );
 }
