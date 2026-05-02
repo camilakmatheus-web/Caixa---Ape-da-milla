@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { auth, provider } from "./firebase";
+import { signInWithPopup, signOut } from "firebase/auth";
 
 const API = "https://caixa-ape-da-milla.onrender.com";
 
@@ -44,9 +46,15 @@ export default function App() {
     alert("Conta criada");
   };
 
-  // ================= LOGIN GOOGLE (DESATIVADO TEMPORARIAMENTE) =================
-  const loginGoogle = () => {
-    alert("Firebase ainda não configurado. Reative depois.");
+  // ================= LOGIN GOOGLE REAL =================
+  const loginGoogle = async () => {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    setUser(user);
+    setToken(user.uid);
+
+    localStorage.setItem("token", user.uid);
   };
 
   // ================= CARREGAR =================
@@ -158,7 +166,10 @@ export default function App() {
     <div style={{ padding: 20, fontFamily: "Arial" }}>
       <h1>💰 Sistema Caixa</h1>
 
+      {user && <p>👤 {user.displayName}</p>}
+
       <button onClick={() => {
+        signOut(auth);
         localStorage.removeItem("token");
         setToken("");
         setUser(null);
