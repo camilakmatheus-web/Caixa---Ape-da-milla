@@ -109,84 +109,98 @@ export default function App() {
     p.nome?.toLowerCase().includes(busca.toLowerCase())
   );
 
+  // ================= CARRINHO =================
   const addCarrinho = () => {
-  if (!produto || produto.estoque <= 0) return;
+    if (!produto || produto.estoque <= 0) return;
 
-  setCarrinho(prev => {
-    const existe = prev.find(p => p.id === produto.id);
+    setCarrinho(prev => {
+      const existe = prev.find(p => p.id === produto.id);
 
-    if (existe) {
-      return prev.map(p =>
+      if (existe) {
+        return prev.map(p =>
+          p.id === produto.id
+            ? { ...p, qtd: (p.qtd || 1) + 1 }
+            : p
+        );
+      }
+
+      return [...prev, { ...produto, qtd: 1 }];
+    });
+
+    setProdutos(prev =>
+      prev.map(p =>
         p.id === produto.id
-          ? { ...p, qtd: (p.qtd || 1) + 1 }
-          : p
-      );
-    }
-
-    return [...prev, { ...produto, qtd: 1 }];
-  });
-
-  setProdutos(prev =>
-    prev.map(p =>
-      p.id === produto.id
-        ? { ...p, estoque: p.estoque - 1 }
-        : p
-    )
-  );
-};
-
-  const total = carrinho.reduce((a, p) => a + p.preco * (p.qtd || 1), 0);
-  const removerItem = (id) => {
-  setCarrinho(prev =>
-    prev
-      .map(p =>
-        p.id === id
-          ? { ...p, qtd: p.qtd - 1 }
+          ? { ...p, estoque: p.estoque - 1 }
           : p
       )
-      .filter(p => p.qtd > 0)
-  );
-
-  setProdutos(prev =>
-    prev.map(p =>
-      p.id === id
-        ? { ...p, estoque: p.estoque + 1 }
-        : p
-    )
-  );
-};
-
-const limparCarrinho = () => {
-  setCarrinho([]);
-};
-
- const finalizar = () => {
-  if (!carrinho.length) return;
-
-  const agora = new Date();
-
-  const data = agora.toISOString().split("T")[0]; // 2026-05-02
-  const hora = agora.toTimeString().slice(0, 5); // 14:32
-
-  const novaVenda = {
-    id: Date.now(),
-    itens: carrinho,
-    total,
-    data,
-    hora,
-    timestamp: Date.now()
+    );
   };
 
-  setVendas(prev => [...prev, novaVenda]);
+  const removerItem = (id) => {
+    setCarrinho(prev =>
+      prev
+        .map(p =>
+          p.id === id
+            ? { ...p, qtd: p.qtd - 1 }
+            : p
+        )
+        .filter(p => p.qtd > 0)
+    );
 
-  setCarrinho([]);
-};
-const hoje = new Date().toISOString().split("T")[0];
+    setProdutos(prev =>
+      prev.map(p =>
+        p.id === id
+          ? { ...p, estoque: p.estoque + 1 }
+          : p
+      )
+    );
+  };
 
-const vendasHoje = vendas.filter(v => v.data === hoje);
+  const limparCarrinho = () => {
+    setCarrinho([]);
+  };
 
-const totalHoje = vendasHoje.reduce((soma, v) => soma + v.total, 0);
-  // ================= LOGIN =================
+  const total = carrinho.reduce(
+    (a, p) => a + p.preco * (p.qtd || 1),
+    0
+  );
+
+  // ================= FINALIZAR =================
+  const finalizar = () => {
+    if (!carrinho.length) return;
+
+    const agora = new Date();
+
+    const novaVenda = {
+      id: Date.now(),
+      itens: carrinho,
+      total,
+      data: agora.toISOString().split("T")[0],
+      hora: agora.toTimeString().slice(0, 5),
+      timestamp: Date.now()
+    };
+
+    setVendas(prev => {
+      const atual = Array.isArray(prev) ? prev : [];
+      return [...atual, novaVenda];
+    });
+
+    setCarrinho([]);
+  };
+
+  // ================= VENDAS DO DIA (SEGURADO) =================
+  const hoje = new Date().toISOString().split("T")[0];
+
+  const vendasHoje = Array.isArray(vendas)
+    ? vendas.filter(v => v.data === hoje)
+    : [];
+
+  const totalHoje = vendasHoje.reduce(
+    (soma, v) => soma + (v.total || 0),
+    0
+  );
+
+  // ================= LOGIN SCREEN =================
   if (!token) {
     return (
       <div style={{ padding: 20 }}>
@@ -242,51 +256,54 @@ const totalHoje = vendasHoje.reduce((soma, v) => soma + v.total, 0);
         <h1>💰 MAGNUS</h1>
         {user && <p>👤 {user.displayName}</p>}
 
-        {/* ================= VENDAS ================= */}
+        {/* VENDAS */}
         {tab === "vendas" && (
-  <div>
-    <h2>💰 Vendas do Dia</h2>
+          <div>
+            <h2>💰 Vendas do Dia</h2>
 
-    <input
-      placeholder="Buscar produto"
-      value={busca}
-      onChange={e => setBusca(e.target.value)}
-    />
+            <input
+              placeholder="Buscar produto"
+              value={busca}
+              onChange={e => setBusca(e.target.value)}
+            />
 
-    {produto && (
-      <div>
-        {produto.nome} - R$ {produto.preco}
-        <button onClick={addCarrinho}>Adicionar</button>
-      </div>
-    )}
+            {produto && (
+              <div>
+                {produto.nome} - R$ {produto.preco}
+                <button onClick={addCarrinho}>Adicionar</button>
+              </div>
+            )}
 
-    <h3>🛒 Carrinho</h3>
+            <h3>🛒 Carrinho</h3>
 
-    {carrinho.map((item, i) => (
-      <div key={i}>
-        {item.nome} - R$ {item.preco}
-      </div>
-    ))}
+            {carrinho.map((item, i) => (
+              <div key={i}>
+                {item.nome} x{item.qtd || 1} - R$ {(item.preco * (item.qtd || 1)).toFixed(2)}
+                <button onClick={() => removerItem(item.id)}>➖</button>
+              </div>
+            ))}
 
-    <h3>Total: R$ {total.toFixed(2)}</h3>
+            <button onClick={limparCarrinho}>🗑 Limpar Carrinho</button>
 
-    <button onClick={finalizar}>Finalizar venda</button>
+            <h3>Total: R$ {total.toFixed(2)}</h3>
 
-    <hr />
+            <button onClick={finalizar}>Finalizar venda</button>
 
-    <h3>📊 Total do dia: R$ {totalHoje.toFixed(2)}</h3>
+            <hr />
 
-    <h3>📋 Histórico do dia</h3>
+            <h3>📊 Total do dia: R$ {totalHoje.toFixed(2)}</h3>
 
-    {vendasHoje.map(v => (
-      <div key={v.id}>
-        🕒 {v.hora} - R$ {v.total}
-      </div>
-    ))}
-  </div>
-)}
+            <h3>📋 Histórico do dia</h3>
 
-        {/* ================= PRODUTOS ================= */}
+            {vendasHoje.map(v => (
+              <div key={v.id}>
+                🕒 {v.hora} - R$ {v.total}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* PRODUTOS */}
         {tab === "produtos" && (
           <div>
             <h2>Produtos</h2>
@@ -305,10 +322,9 @@ const totalHoje = vendasHoje.reduce((soma, v) => soma + v.total, 0);
           </div>
         )}
 
-        {/* ================= OUTRAS ABAS (BASE) ================= */}
-        {tab === "pendentes" && <h2>Pendentes (em construção)</h2>}
-        {tab === "stats" && <h2>Estatísticas (em construção)</h2>}
-        {tab === "extrato" && <h2>Extrato (em construção)</h2>}
+        {tab === "pendentes" && <h2>Pendentes</h2>}
+        {tab === "stats" && <h2>Estatísticas</h2>}
+        {tab === "extrato" && <h2>Extrato</h2>}
 
       </div>
     </div>
