@@ -3,6 +3,11 @@ import { useState, useEffect } from "react";
 const API = "https://caixa-ape-da-milla.onrender.com";
 
 export default function App() {
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const [produtos, setProdutos] = useState([]);
   const [vendas, setVendas] = useState([]);
   const [pendentes, setPendentes] = useState([]);
@@ -14,25 +19,60 @@ export default function App() {
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
 
+  // ================= LOGIN =================
+  const login = async () => {
+    const res = await fetch(API + "/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    localStorage.setItem("token", data.token);
+    setToken(data.token);
+  };
+
+  const register = async () => {
+    await fetch(API + "/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+
+    alert("Conta criada");
+  };
+
+  // ================= CARREGAR =================
   useEffect(() => {
-    fetch(`${API}/dados`)
+    if (!token) return;
+
+    fetch(API + "/dados", {
+      headers: { Authorization: token }
+    })
       .then(r => r.json())
       .then(d => {
         setProdutos(d.produtos || []);
         setVendas(d.vendas || []);
         setPendentes(d.pendentes || []);
-      })
-      .catch(console.log);
-  }, []);
+      });
+  }, [token]);
 
+  // ================= SALVAR =================
   useEffect(() => {
-    fetch(`${API}/dados`, {
+    if (!token) return;
+
+    fetch(API + "/dados", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token
+      },
       body: JSON.stringify({ produtos, vendas, pendentes })
-    }).catch(console.log);
+    });
   }, [produtos, vendas, pendentes]);
 
+  // ================= PRODUTOS =================
   const adicionarProduto = () => {
     if (!nome || !preco || !estoque) return;
 
@@ -52,7 +92,7 @@ export default function App() {
   };
 
   const produto = produtos.find(p =>
-    p.nome.toLowerCase().includes(busca.toLowerCase())
+    p.nome?.toLowerCase().includes(busca.toLowerCase())
   );
 
   const addCarrinho = () => {
@@ -86,176 +126,65 @@ export default function App() {
     setCarrinho([]);
   };
 
-  return (
-    <div style={styles.page}>
-      <div style={styles.container}>
+  // ================= LOGIN SCREEN =================
+  if (!token) {
+    return (
+      <div style={{ padding: 20 }}>
+        <h2>Login</h2>
 
-        <h1 style={styles.title}>💰 Apé da Milla</h1>
+        <input placeholder="email" onChange={e => setEmail(e.target.value)} />
+        <input placeholder="senha" type="password" onChange={e => setPassword(e.target.value)} />
 
-        <div style={styles.card}>
-          <h2>📦 Produtos</h2>
-
-          <div style={styles.row}>
-            <input style={styles.input} placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} />
-            <input style={styles.input} placeholder="Preço" value={preco} onChange={e => setPreco(e.target.value)} />
-            <input style={styles.input} placeholder="Estoque" value={estoque} onChange={e => setEstoque(e.target.value)} />
-          </div>
-
-          <button style={styles.button} onClick={adicionarProduto}>
-            + Adicionar Produto
-          </button>
-
-          <div style={styles.list}>
-            {produtos.map(p => (
-              <div key={p.id} style={styles.item}>
-                <b>{p.nome}</b>
-                <span>R$ {p.preco} | estoque: {p.estoque}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={styles.cardAccent}>
-          <h2>🛒 Caixa</h2>
-
-          <input
-            style={styles.inputFull}
-            placeholder="Buscar produto..."
-            value={busca}
-            onChange={e => setBusca(e.target.value)}
-          />
-
-          {produto && (
-            <div style={styles.result}>
-              <span>{produto.nome} — R$ {produto.preco}</span>
-              <button style={styles.smallBtn} onClick={addCarrinho}>
-                Adicionar
-              </button>
-            </div>
-          )}
-
-          <h3>Total: R$ {total.toFixed(2)}</h3>
-
-          <button style={styles.buttonGreen} onClick={finalizar}>
-            Finalizar Venda
-          </button>
-        </div>
-
+        <button onClick={login}>Entrar</button>
+        <button onClick={register}>Criar conta</button>
       </div>
+    );
+  }
+
+  // ================= APP =================
+  return (
+    <div style={{ padding: 20, fontFamily: "Arial" }}>
+      <h1>💰 Sistema Caixa</h1>
+
+      <button onClick={() => {
+        localStorage.removeItem("token");
+        setToken("");
+      }}>
+        Sair
+      </button>
+
+      <hr />
+
+      <h2>Produtos</h2>
+
+      <input placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} />
+      <input placeholder="Preço" value={preco} onChange={e => setPreco(e.target.value)} />
+      <input placeholder="Estoque" value={estoque} onChange={e => setEstoque(e.target.value)} />
+
+      <button onClick={adicionarProduto}>Adicionar</button>
+
+      {produtos.map(p => (
+        <div key={p.id}>
+          {p.nome} - R$ {p.preco} ({p.estoque})
+        </div>
+      ))}
+
+      <hr />
+
+      <h2>Caixa</h2>
+
+      <input placeholder="Buscar" value={busca} onChange={e => setBusca(e.target.value)} />
+
+      {produto && (
+        <div>
+          {produto.nome} - R$ {produto.preco}
+          <button onClick={addCarrinho}>Adicionar</button>
+        </div>
+      )}
+
+      <h3>Total: R$ {total.toFixed(2)}</h3>
+
+      <button onClick={finalizar}>Finalizar</button>
     </div>
   );
 }
-
-const styles = {
-  page: {
-    minHeight: "100vh",
-    padding: 20,
-    fontFamily: "Arial",
-    color: "#fff",
-
-    // 🔥 FUNDO LARANJA
-    background: "linear-gradient(135deg, #ff7a18, #ffb347)"
-  },
-
-  container: {
-    maxWidth: 900,
-    margin: "0 auto"
-  },
-
-  title: {
-    textAlign: "center",
-    marginBottom: 25,
-    fontSize: 32
-  },
-
-  card: {
-    background: "rgba(30, 41, 59, 0.85)",
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 20,
-    boxShadow: "0 12px 30px rgba(0,0,0,0.4)",
-    backdropFilter: "blur(10px)"
-  },
-
-  cardAccent: {
-    background: "rgba(15, 23, 42, 0.95)",
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 20,
-    boxShadow: "0 12px 30px rgba(0,0,0,0.5)",
-    border: "1px solid #334155"
-  },
-
-  row: {
-    display: "flex",
-    gap: 10,
-    marginBottom: 10
-  },
-
-  input: {
-    flex: 1,
-    padding: 10,
-    borderRadius: 10,
-    border: "none",
-    outline: "none"
-  },
-
-  inputFull: {
-    width: "100%",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 10,
-    border: "none",
-    outline: "none"
-  },
-
-  button: {
-    padding: 10,
-    background: "#3b82f6",
-    border: "none",
-    color: "#fff",
-    borderRadius: 10,
-    cursor: "pointer",
-    marginTop: 5
-  },
-
-  buttonGreen: {
-    padding: 12,
-    background: "#22c55e",
-    border: "none",
-    color: "#fff",
-    borderRadius: 10,
-    cursor: "pointer",
-    width: "100%",
-    fontWeight: "bold"
-  },
-
-  list: {
-    marginTop: 10
-  },
-
-  item: {
-    padding: 10,
-    borderBottom: "1px solid #334155",
-    display: "flex",
-    justifyContent: "space-between"
-  },
-
-  result: {
-    margin: "10px 0",
-    padding: 12,
-    background: "#334155",
-    borderRadius: 10,
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-
-  smallBtn: {
-    background: "#f59e0b",
-    border: "none",
-    padding: "6px 12px",
-    borderRadius: 8,
-    cursor: "pointer"
-  }
-};
