@@ -23,6 +23,11 @@ export default function App() {
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
 
+  // 🔥 NOVO (NIVEL 3)
+  const [cliente, setCliente] = useState("");
+  const [pagamento, setPagamento] = useState("dinheiro");
+  const [modoVenda, setModoVenda] = useState("normal"); // normal | pendente
+
   // ================= LOGIN =================
   const login = async () => {
     const res = await fetch(API + "/login", {
@@ -156,16 +161,14 @@ export default function App() {
     );
   };
 
-  const limparCarrinho = () => {
-    setCarrinho([]);
-  };
+  const limparCarrinho = () => setCarrinho([]);
 
   const total = carrinho.reduce(
     (a, p) => a + p.preco * (p.qtd || 1),
     0
   );
 
-  // ================= FINALIZAR =================
+  // ================= FINALIZAR (NIVEL 3 COMPLETO) =================
   const finalizar = () => {
     if (!carrinho.length) return;
 
@@ -173,6 +176,9 @@ export default function App() {
 
     const novaVenda = {
       id: Date.now(),
+      cliente: cliente || "Sem nome",
+      pagamento, // 💳 dinheiro | pix | cartão
+      modo: modoVenda, // normal | pendente
       itens: carrinho,
       total,
       data: agora.toISOString().split("T")[0],
@@ -180,25 +186,24 @@ export default function App() {
       timestamp: Date.now()
     };
 
-    setVendas(prev => {
-      const atual = Array.isArray(prev) ? prev : [];
-      return [...atual, novaVenda];
-    });
+    // 🔥 venda normal ou pendente
+    if (modoVenda === "pendente") {
+      setPendentes(prev => [...prev, novaVenda]);
+    } else {
+      setVendas(prev => [...prev, novaVenda]);
+    }
 
     setCarrinho([]);
+    setCliente("");
+    setPagamento("dinheiro");
+    setModoVenda("normal");
   };
 
-  // ================= VENDAS DO DIA (SEGURADO) =================
   const hoje = new Date().toISOString().split("T")[0];
 
-  const vendasHoje = Array.isArray(vendas)
-    ? vendas.filter(v => v.data === hoje)
-    : [];
+  const vendasHoje = vendas.filter(v => v.data === hoje);
 
-  const totalHoje = vendasHoje.reduce(
-    (soma, v) => soma + (v.total || 0),
-    0
-  );
+  const totalHoje = vendasHoje.reduce((soma, v) => soma + v.total, 0);
 
   // ================= LOGIN SCREEN =================
   if (!token) {
@@ -219,18 +224,11 @@ export default function App() {
     );
   }
 
-  // ================= SISTEMA =================
+  // ================= UI =================
   return (
     <div style={{ display: "flex", fontFamily: "Arial" }}>
 
-      {/* MENU */}
-      <div style={{
-        width: 220,
-        minHeight: "100vh",
-        background: "#0f0f1a",
-        color: "#fff",
-        padding: 20
-      }}>
+      <div style={{ width: 220, minHeight: "100vh", background: "#0f0f1a", color: "#fff", padding: 20 }}>
         <h2 style={{ color: "#a855f7" }}>MAGNUS</h2>
 
         <button onClick={() => setTab("vendas")}>Vendas</button>
@@ -250,22 +248,32 @@ export default function App() {
         </button>
       </div>
 
-      {/* CONTEÚDO */}
       <div style={{ flex: 1, padding: 20 }}>
 
         <h1>💰 MAGNUS</h1>
+
         {user && <p>👤 {user.displayName}</p>}
 
-        {/* VENDAS */}
+        {/* ================= VENDAS ================= */}
         {tab === "vendas" && (
           <div>
-            <h2>💰 Vendas do Dia</h2>
 
-            <input
-              placeholder="Buscar produto"
-              value={busca}
-              onChange={e => setBusca(e.target.value)}
-            />
+            <h2>💰 Vendas</h2>
+
+            <input placeholder="Cliente (opcional)" value={cliente} onChange={e => setCliente(e.target.value)} />
+
+            <select value={pagamento} onChange={e => setPagamento(e.target.value)}>
+              <option value="dinheiro">Dinheiro</option>
+              <option value="pix">Pix</option>
+              <option value="cartao">Cartão</option>
+            </select>
+
+            <select value={modoVenda} onChange={e => setModoVenda(e.target.value)}>
+              <option value="normal">Venda normal</option>
+              <option value="pendente">Venda pendente (fiado)</option>
+            </select>
+
+            <input placeholder="Buscar produto" value={busca} onChange={e => setBusca(e.target.value)} />
 
             {produto && (
               <div>
@@ -283,23 +291,12 @@ export default function App() {
               </div>
             ))}
 
-            <button onClick={limparCarrinho}>🗑 Limpar Carrinho</button>
+            <button onClick={limparCarrinho}>Limpar</button>
 
             <h3>Total: R$ {total.toFixed(2)}</h3>
 
             <button onClick={finalizar}>Finalizar venda</button>
 
-            <hr />
-
-            <h3>📊 Total do dia: R$ {totalHoje.toFixed(2)}</h3>
-
-            <h3>📋 Histórico do dia</h3>
-
-            {vendasHoje.map(v => (
-              <div key={v.id}>
-                🕒 {v.hora} - R$ {v.total}
-              </div>
-            ))}
           </div>
         )}
 
