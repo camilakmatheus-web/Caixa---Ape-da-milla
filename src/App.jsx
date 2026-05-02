@@ -127,21 +127,32 @@ export default function App() {
 
   const total = carrinho.reduce((a, p) => a + p.preco, 0);
 
-  const finalizar = () => {
-    if (!carrinho.length) return;
+ const finalizar = () => {
+  if (!carrinho.length) return;
 
-    setVendas(prev => [
-      ...prev,
-      {
-        itens: carrinho,
-        total,
-        data: new Date().toISOString()
-      }
-    ]);
+  const agora = new Date();
 
-    setCarrinho([]);
+  const data = agora.toISOString().split("T")[0]; // 2026-05-02
+  const hora = agora.toTimeString().slice(0, 5); // 14:32
+
+  const novaVenda = {
+    id: Date.now(),
+    itens: carrinho,
+    total,
+    data,
+    hora,
+    timestamp: Date.now()
   };
 
+  setVendas(prev => [...prev, novaVenda]);
+
+  setCarrinho([]);
+};
+const hoje = new Date().toISOString().split("T")[0];
+
+const vendasHoje = vendas.filter(v => v.data === hoje);
+
+const totalHoje = vendasHoje.reduce((soma, v) => soma + v.total, 0);
   // ================= LOGIN =================
   if (!token) {
     return (
@@ -200,32 +211,47 @@ export default function App() {
 
         {/* ================= VENDAS ================= */}
         {tab === "vendas" && (
-          <div>
-            <h2>Vendas</h2>
+  <div>
+    <h2>💰 Vendas do Dia</h2>
 
-            <input placeholder="Buscar produto" value={busca} onChange={e => setBusca(e.target.value)} />
+    <input
+      placeholder="Buscar produto"
+      value={busca}
+      onChange={e => setBusca(e.target.value)}
+    />
 
-            {produto && (
-              <div>
-                {produto.nome} - R$ {produto.preco}
-                <button onClick={addCarrinho}>Adicionar</button>
-              </div>
-            )}
+    {produto && (
+      <div>
+        {produto.nome} - R$ {produto.preco}
+        <button onClick={addCarrinho}>Adicionar</button>
+      </div>
+    )}
 
-            <h3>Total: R$ {total.toFixed(2)}</h3>
+    <h3>🛒 Carrinho</h3>
 
-            <button onClick={finalizar}>Finalizar venda</button>
+    {carrinho.map((item, i) => (
+      <div key={i}>
+        {item.nome} - R$ {item.preco}
+      </div>
+    ))}
 
-            <hr />
+    <h3>Total: R$ {total.toFixed(2)}</h3>
 
-            <h3>Histórico</h3>
-            {vendas.map((v, i) => (
-              <div key={i}>
-                💰 R$ {v.total} - {v.data}
-              </div>
-            ))}
-          </div>
-        )}
+    <button onClick={finalizar}>Finalizar venda</button>
+
+    <hr />
+
+    <h3>📊 Total do dia: R$ {totalHoje.toFixed(2)}</h3>
+
+    <h3>📋 Histórico do dia</h3>
+
+    {vendasHoje.map(v => (
+      <div key={v.id}>
+        🕒 {v.hora} - R$ {v.total}
+      </div>
+    ))}
+  </div>
+)}
 
         {/* ================= PRODUTOS ================= */}
         {tab === "produtos" && (
