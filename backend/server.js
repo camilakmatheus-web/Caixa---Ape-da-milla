@@ -18,7 +18,7 @@ mongoose.connect(
     "mongodb+srv://apedamila:92533911@cluster0.fyggn20.mongodb.net/caixa?retryWrites=true&w=majority"
 )
   .then(() => console.log("MongoDB conectado"))
-  .catch(err => console.log(err));
+  .catch(err => console.log("Erro Mongo:", err));
 
 // ================= MODELS =================
 const User = mongoose.model("User", {
@@ -37,20 +37,23 @@ const Caixa = mongoose.model("Caixa", {
 function auth(req, res, next) {
   const token = req.headers.authorization;
 
-  if (!token) return res.status(401).send("Sem token");
+  if (!token) return res.status(401).json({ error: "Sem token" });
 
   try {
     const decoded = jwt.verify(token, SECRET);
     req.userId = decoded.id;
     next();
   } catch (err) {
-    return res.status(401).send("Token inválido");
+    return res.status(401).json({ error: "Token inválido" });
   }
 }
 
 // ================= REGISTER =================
 app.post("/register", async (req, res) => {
   const { email, password } = req.body;
+
+  const exists = await User.findOne({ email });
+  if (exists) return res.status(400).json({ error: "Usuário já existe" });
 
   const hash = await bcrypt.hash(password, 10);
 
@@ -65,13 +68,15 @@ app.post("/login", async (req, res) => {
 
   const user = await User.findOne({ email });
 
-  if (!user) return res.status(401).send("Usuário não existe");
+  if (!user) return res.status(401).json({ error: "Usuário não existe" });
 
   const ok = await bcrypt.compare(password, user.password);
 
-  if (!ok) return res.status(401).send("Senha inválida");
+  if (!ok) return res.status(401).json({ error: "Senha inválida" });
 
-  const token = jwt.sign({ id: user._id }, SECRET);
+  const token = jwt.sign({ id: user._id }, SECRET, {
+    expiresIn: "7d"
+  });
 
   res.json({ token });
 });
@@ -92,11 +97,11 @@ app.get("/dados", auth, async (req, res) => {
   res.json(dados);
 });
 
-// ================= SAVE DADOS (FIXADO) =================
+// ================= SAVE DADOS (ESTÁVEL) =================
 app.post("/dados", auth, async (req, res) => {
   const { produtos, vendas, pendentes } = req.body;
 
-  await Caixa.findOneAndUpdate(
+  const updated = await Caixa.findOneAndUpdate(
     { userId: req.userId },
     {
       $set: {
@@ -105,15 +110,18 @@ app.post("/dados", auth, async (req, res) => {
         pendentes: pendentes || []
       }
     },
-    { upsert: true, new: true }
+    {
+      upsert: true,
+      new: true
+    }
   );
 
-  res.json({ ok: true });
+  res.json(updated);
 });
 
 // ================= START =================
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-  console.log("Backend MAGNUS rodando na porta", PORT);
+  console.log("🚀 MAGNUS backend rodando na porta", PORT);
 });

@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
+import { auth, provider } from "./firebase";
+import { signInWithPopup, signOut } from "firebase/auth";
 
 const API = "https://caixa-ape-da-milla.onrender.com";
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [user, setUser] = useState(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +22,7 @@ export default function App() {
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
 
-  // ================= LOGIN =================
+  // ================= LOGIN EMAIL =================
   const login = async () => {
     const res = await fetch(API + "/login", {
       method: "POST",
@@ -43,9 +46,17 @@ export default function App() {
     alert("Conta criada");
   };
 
-  // ❌ LOGIN GOOGLE REMOVIDO (INCOMPATÍVEL COM BACKEND ATUAL)
-  const loginGoogle = () => {
-    alert("Use login normal (Google será integrado depois com Firebase Auth ID Token)");
+  // ================= LOGIN GOOGLE (CORRETO) =================
+  const loginGoogle = async () => {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    // 🔥 token REAL do Firebase (IMPORTANTE)
+    const idToken = await user.getIdToken();
+
+    setUser(user);
+    setToken(idToken);
+    localStorage.setItem("token", idToken);
   };
 
   // ================= CARREGAR =================
@@ -63,18 +74,22 @@ export default function App() {
       });
   }, [token]);
 
-  // ================= SALVAR =================
+  // ================= SALVAR (CORRIGIDO - ESTÁVEL) =================
   useEffect(() => {
     if (!token) return;
 
-    fetch(API + "/dados", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token
-      },
-      body: JSON.stringify({ produtos, vendas, pendentes })
-    });
+    const timeout = setTimeout(() => {
+      fetch(API + "/dados", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token
+        },
+        body: JSON.stringify({ produtos, vendas, pendentes })
+      });
+    }, 500);
+
+    return () => clearTimeout(timeout);
   }, [produtos, vendas, pendentes]);
 
   // ================= PRODUTOS =================
@@ -148,7 +163,7 @@ export default function App() {
         <hr />
 
         <button onClick={loginGoogle}>
-          🔐 Entrar com Google (em breve)
+          🔐 Entrar com Google
         </button>
       </div>
     );
@@ -159,10 +174,16 @@ export default function App() {
     <div style={{ padding: 20, fontFamily: "Arial" }}>
       <h1>💰 Sistema Caixa</h1>
 
-      <button onClick={() => {
-        localStorage.removeItem("token");
-        setToken("");
-      }}>
+      {user && <p>👤 {user.displayName}</p>}
+
+      <button
+        onClick={() => {
+          signOut(auth);
+          localStorage.removeItem("token");
+          setToken("");
+          setUser(null);
+        }}
+      >
         Sair
       </button>
 
