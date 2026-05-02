@@ -110,22 +110,55 @@ export default function App() {
   );
 
   const addCarrinho = () => {
-    if (!produto || produto.estoque <= 0) return;
+  if (!produto || produto.estoque <= 0) return;
 
-    setCarrinho(prev => [...prev, { ...produto }]);
+  setCarrinho(prev => {
+    const existe = prev.find(p => p.id === produto.id);
 
-    setProdutos(prev =>
-      prev.map(p =>
+    if (existe) {
+      return prev.map(p =>
         p.id === produto.id
-          ? { ...p, estoque: p.estoque - 1 }
+          ? { ...p, qtd: (p.qtd || 1) + 1 }
+          : p
+      );
+    }
+
+    return [...prev, { ...produto, qtd: 1 }];
+  });
+
+  setProdutos(prev =>
+    prev.map(p =>
+      p.id === produto.id
+        ? { ...p, estoque: p.estoque - 1 }
+        : p
+    )
+  );
+};
+
+  const total = carrinho.reduce((a, p) => a + p.preco * (p.qtd || 1), 0);
+  const removerItem = (id) => {
+  setCarrinho(prev =>
+    prev
+      .map(p =>
+        p.id === id
+          ? { ...p, qtd: p.qtd - 1 }
           : p
       )
-    );
+      .filter(p => p.qtd > 0)
+  );
 
-    setBusca("");
-  };
+  setProdutos(prev =>
+    prev.map(p =>
+      p.id === id
+        ? { ...p, estoque: p.estoque + 1 }
+        : p
+    )
+  );
+};
 
-  const total = carrinho.reduce((a, p) => a + p.preco, 0);
+const limparCarrinho = () => {
+  setCarrinho([]);
+};
 
  const finalizar = () => {
   if (!carrinho.length) return;
