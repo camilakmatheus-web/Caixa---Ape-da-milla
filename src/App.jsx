@@ -13,15 +13,13 @@ export default function App() {
 
   const [carrinho, setCarrinho] = useState([]);
   const [busca, setBusca] = useState("");
-
   const [carregado, setCarregado] = useState(false);
 
-  // 🔥 CARREGAR DADOS
+  // CARREGAR DADOS
   useEffect(() => {
     const carregar = async () => {
       try {
         const res = await fetch(`${API}/dados`);
-
         if (!res.ok) return;
 
         const dados = await res.json();
@@ -39,7 +37,7 @@ export default function App() {
     carregar();
   }, []);
 
-  // 🔥 SALVAR (SÓ DEPOIS DE CARREGAR)
+  // SALVAR
   useEffect(() => {
     if (!carregado) return;
 
