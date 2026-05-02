@@ -1,102 +1,67 @@
 const express = require("express");
 const cors = require("cors");
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-// 🔐 CONFIG
-const SECRET = "segredo_super_forte_123";
+// ================= BANCO SIMPLES (DEMO) =================
+let db = [];
 
-// 📦 MONGODB
-mongoose.connect(process.env.MONGO_URL || "mongodb+srv://apedamila:92533911@cluster0.fyggn20.mongodb.net/caixa?retryWrites=true&w=majority")
-  .then(() => console.log("MongoDB conectado"))
-  .catch(err => console.log(err));
+// ================= FUNÇÃO PEGAR USUÁRIO =================
+function getUser(userId) {
+  let user = db.find(u => u.userId === userId);
 
-// ================= MODELS =================
-const User = mongoose.model("User", {
-  email: String,
-  password: String
-});
-
-const Caixa = mongoose.model("Caixa", {
-  userId: String,
-  produtos: Array,
-  vendas: Array,
-  pendentes: Array
-});
-
-// ================= MIDDLEWARE =================
-function auth(req, res, next) {
-  const token = req.headers.authorization;
-
-  if (!token) return res.status(401).send("Sem token");
-
-  try {
-    const decoded = jwt.verify(token, SECRET);
-    req.userId = decoded.id;
-    next();
-  } catch {
-    return res.status(401).send("Token inválido");
+  if (!user) {
+    user = {
+      userId,
+      produtos: [],
+      vendas: [],
+      pendentes: []
+    };
+    db.push(user);
   }
+
+  return user;
 }
 
-// ================= AUTH =================
-app.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+// ================= GET DADOS =================
+app.get("/dados", (req, res) => {
+  const userId = req.headers.authorization;
 
-  const hash = await bcrypt.hash(password, 10);
+  if (!userId) return res.status(401).json({ error: "sem user" });
 
-  await User.create({ email, password: hash });
+  const user = getUser(userId);
+
+  res.json(user);
+});
+
+// ================= SALVAR DADOS =================
+app.post("/dados", (req, res) => {
+  const userId = req.headers.authorization;
+
+  if (!userId) return res.status(401).json({ error: "sem user" });
+
+  const user = getUser(userId);
+
+  user.produtos = req.body.produtos || [];
+  user.vendas = req.body.vendas || [];
+  user.pendentes = req.body.pendentes || [];
 
   res.json({ ok: true });
 });
 
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+// ================= RESET DIÁRIO (opcional futuro) =================
+app.post("/reset", (req, res) => {
+  const userId = req.headers.authorization;
 
-  const user = await User.findOne({ email });
-
-  if (!user) return res.status(401).send("Usuário não existe");
-
-  const ok = await bcrypt.compare(password, user.password);
-
-  if (!ok) return res.status(401).send("Senha inválida");
-
-  const token = jwt.sign({ id: user._id }, SECRET);
-
-  res.json({ token });
-});
-
-// ================= DADOS =================
-app.get("/dados", auth, async (req, res) => {
-  let dados = await Caixa.findOne({ userId: req.userId });
-
-  if (!dados) {
-    dados = await Caixa.create({
-      userId: req.userId,
-      produtos: [],
-      vendas: [],
-      pendentes: []
-    });
-  }
-
-  res.json(dados);
-});
-
-app.post("/dados", auth, async (req, res) => {
-  await Caixa.findOneAndUpdate(
-    { userId: req.userId },
-    req.body,
-    { upsert: true }
-  );
+  const user = getUser(userId);
+  user.vendas = [];
 
   res.json({ ok: true });
 });
 
 // ================= START =================
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log("Backend rodando na porta", PORT));
+app.listen(3000, () => {
+  console.log("MAGNUS BACKEND rodando na porta 3000");
+});
