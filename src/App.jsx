@@ -23,7 +23,7 @@ export default function App() {
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
 
-  // 🔥 NOVO (NIVEL 3)
+  // 🔥 NIVEL 3
   const [cliente, setCliente] = useState("");
   const [pagamento, setPagamento] = useState("dinheiro");
   const [modoVenda, setModoVenda] = useState("normal"); // normal | pendente
@@ -168,17 +168,17 @@ export default function App() {
     0
   );
 
-  // ================= FINALIZAR (NIVEL 3 COMPLETO) =================
+  // ================= FINALIZAR (VENDA + PENDENTE) =================
   const finalizar = () => {
     if (!carrinho.length) return;
 
     const agora = new Date();
 
-    const novaVenda = {
+    const venda = {
       id: Date.now(),
       cliente: cliente || "Sem nome",
-      pagamento, // 💳 dinheiro | pix | cartão
-      modo: modoVenda, // normal | pendente
+      pagamento: modoVenda === "normal" ? pagamento : null,
+      modo: modoVenda,
       itens: carrinho,
       total,
       data: agora.toISOString().split("T")[0],
@@ -186,11 +186,10 @@ export default function App() {
       timestamp: Date.now()
     };
 
-    // 🔥 venda normal ou pendente
     if (modoVenda === "pendente") {
-      setPendentes(prev => [...prev, novaVenda]);
+      setPendentes(prev => [...prev, venda]);
     } else {
-      setVendas(prev => [...prev, novaVenda]);
+      setVendas(prev => [...prev, venda]);
     }
 
     setCarrinho([]);
@@ -200,12 +199,10 @@ export default function App() {
   };
 
   const hoje = new Date().toISOString().split("T")[0];
-
   const vendasHoje = vendas.filter(v => v.data === hoje);
-
   const totalHoje = vendasHoje.reduce((soma, v) => soma + v.total, 0);
 
-  // ================= LOGIN SCREEN =================
+  // ================= LOGIN =================
   if (!token) {
     return (
       <div style={{ padding: 20 }}>
@@ -251,10 +248,8 @@ export default function App() {
       <div style={{ flex: 1, padding: 20 }}>
 
         <h1>💰 MAGNUS</h1>
-
         {user && <p>👤 {user.displayName}</p>}
 
-        {/* ================= VENDAS ================= */}
         {tab === "vendas" && (
           <div>
 
@@ -262,16 +257,18 @@ export default function App() {
 
             <input placeholder="Cliente (opcional)" value={cliente} onChange={e => setCliente(e.target.value)} />
 
-            <select value={pagamento} onChange={e => setPagamento(e.target.value)}>
-              <option value="dinheiro">Dinheiro</option>
-              <option value="pix">Pix</option>
-              <option value="cartao">Cartão</option>
-            </select>
-
             <select value={modoVenda} onChange={e => setModoVenda(e.target.value)}>
               <option value="normal">Venda normal</option>
-              <option value="pendente">Venda pendente (fiado)</option>
+              <option value="pendente">Venda pendente</option>
             </select>
+
+            {modoVenda === "normal" && (
+              <select value={pagamento} onChange={e => setPagamento(e.target.value)}>
+                <option value="dinheiro">Dinheiro</option>
+                <option value="pix">Pix</option>
+                <option value="cartao">Cartão</option>
+              </select>
+            )}
 
             <input placeholder="Buscar produto" value={busca} onChange={e => setBusca(e.target.value)} />
 
@@ -282,11 +279,11 @@ export default function App() {
               </div>
             )}
 
-            <h3>🛒 Carrinho</h3>
+            <h3>Carrinho</h3>
 
             {carrinho.map((item, i) => (
               <div key={i}>
-                {item.nome} x{item.qtd || 1} - R$ {(item.preco * (item.qtd || 1)).toFixed(2)}
+                {item.nome} x{item.qtd || 1}
                 <button onClick={() => removerItem(item.id)}>➖</button>
               </div>
             ))}
@@ -295,12 +292,21 @@ export default function App() {
 
             <h3>Total: R$ {total.toFixed(2)}</h3>
 
-            <button onClick={finalizar}>Finalizar venda</button>
+            <button onClick={finalizar}>Finalizar</button>
+
+            <hr />
+
+            <h3>Total do dia: R$ {totalHoje.toFixed(2)}</h3>
+
+            {vendasHoje.map(v => (
+              <div key={v.id}>
+                🕒 {v.hora} - R$ {v.total}
+              </div>
+            ))}
 
           </div>
         )}
 
-        {/* PRODUTOS */}
         {tab === "produtos" && (
           <div>
             <h2>Produtos</h2>
