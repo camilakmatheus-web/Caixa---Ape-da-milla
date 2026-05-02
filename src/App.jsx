@@ -11,56 +11,28 @@ export default function App() {
   const [preco, setPreco] = useState("");
   const [estoque, setEstoque] = useState("");
 
-  const [carrinho, setCarrinho] = useState([]);
   const [busca, setBusca] = useState("");
-  const [carregado, setCarregado] = useState(false);
+  const [carrinho, setCarrinho] = useState([]);
 
-  // CARREGAR DADOS
   useEffect(() => {
-    const carregar = async () => {
-      try {
-        const res = await fetch(`${API}/dados`);
-        if (!res.ok) return;
-
-        const dados = await res.json();
-
-        setProdutos(dados?.produtos || []);
-        setVendas(dados?.vendas || []);
-        setPendentes(dados?.pendentes || []);
-
-        setCarregado(true);
-      } catch (err) {
-        console.log("Erro ao carregar:", err);
-      }
-    };
-
-    carregar();
+    fetch(`${API}/dados`)
+      .then(r => r.json())
+      .then(d => {
+        setProdutos(d.produtos || []);
+        setVendas(d.vendas || []);
+        setPendentes(d.pendentes || []);
+      })
+      .catch(console.log);
   }, []);
 
-  // SALVAR
   useEffect(() => {
-    if (!carregado) return;
+    fetch(`${API}/dados`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ produtos, vendas, pendentes })
+    }).catch(console.log);
+  }, [produtos, vendas, pendentes]);
 
-    const salvar = async () => {
-      try {
-        await fetch(`${API}/dados`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            produtos,
-            vendas,
-            pendentes
-          })
-        });
-      } catch (err) {
-        console.log("Erro ao salvar:", err);
-      }
-    };
-
-    salvar();
-  }, [produtos, vendas, pendentes, carregado]);
-
-  // PRODUTOS
   const adicionarProduto = () => {
     if (!nome || !preco || !estoque) return;
 
@@ -69,8 +41,8 @@ export default function App() {
       {
         id: Date.now(),
         nome,
-        preco: parseFloat(preco),
-        estoque: parseInt(estoque)
+        preco: Number(preco),
+        estoque: Number(estoque)
       }
     ]);
 
@@ -80,7 +52,7 @@ export default function App() {
   };
 
   const produto = produtos.find(p =>
-    p.nome?.toLowerCase().includes(busca.toLowerCase())
+    p.nome.toLowerCase().includes(busca.toLowerCase())
   );
 
   const addCarrinho = () => {
@@ -97,16 +69,16 @@ export default function App() {
     setBusca("");
   };
 
-  const totalCarrinho = carrinho.reduce((a, p) => a + p.preco, 0);
+  const total = carrinho.reduce((a, p) => a + p.preco, 0);
 
-  const finalizarVenda = () => {
-    if (carrinho.length === 0) return;
+  const finalizar = () => {
+    if (!carrinho.length) return;
 
     setVendas([
       ...vendas,
       {
         itens: carrinho,
-        total: totalCarrinho,
+        total,
         data: new Date().toISOString()
       }
     ]);
@@ -115,43 +87,141 @@ export default function App() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>💰 Apé da Milla</h1>
+    <div style={styles.page}>
+      <div style={styles.container}>
 
-      <h2>Produtos</h2>
+        <h1 style={styles.title}>💰 Apé da Milla</h1>
 
-      <input placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} />
-      <input placeholder="Preço" value={preco} onChange={e => setPreco(e.target.value)} />
-      <input placeholder="Estoque" value={estoque} onChange={e => setEstoque(e.target.value)} />
+        {/* PRODUTOS */}
+        <div style={styles.card}>
+          <h2>📦 Produtos</h2>
 
-      <button onClick={adicionarProduto}>Salvar</button>
+          <div style={styles.row}>
+            <input style={styles.input} placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} />
+            <input style={styles.input} placeholder="Preço" value={preco} onChange={e => setPreco(e.target.value)} />
+            <input style={styles.input} placeholder="Estoque" value={estoque} onChange={e => setEstoque(e.target.value)} />
+          </div>
 
-      {produtos.map(p => (
-        <div key={p.id}>
-          {p.nome} - R$ {p.preco} (Estoque: {p.estoque})
+          <button style={styles.button} onClick={adicionarProduto}>
+            + Adicionar
+          </button>
+
+          <div style={styles.list}>
+            {produtos.map(p => (
+              <div key={p.id} style={styles.item}>
+                <b>{p.nome}</b> — R$ {p.preco} | estoque: {p.estoque}
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
 
-      <hr />
+        {/* CAIXA */}
+        <div style={styles.card}>
+          <h2>🛒 Caixa</h2>
 
-      <h2>Caixa</h2>
+          <input
+            style={styles.inputFull}
+            placeholder="Buscar produto..."
+            value={busca}
+            onChange={e => setBusca(e.target.value)}
+          />
 
-      <input
-        placeholder="Buscar produto"
-        value={busca}
-        onChange={e => setBusca(e.target.value)}
-      />
+          {produto && (
+            <div style={styles.result}>
+              {produto.nome} — R$ {produto.preco}
+              <button style={styles.smallBtn} onClick={addCarrinho}>Adicionar</button>
+            </div>
+          )}
 
-      {produto && (
-        <div>
-          {produto.nome} - R$ {produto.preco}
-          <button onClick={addCarrinho}>Adicionar</button>
+          <h3>Total: R$ {total.toFixed(2)}</h3>
+
+          <button style={styles.buttonGreen} onClick={finalizar}>
+            Finalizar Venda
+          </button>
         </div>
-      )}
 
-      <h3>Total: R$ {totalCarrinho.toFixed(2)}</h3>
-
-      <button onClick={finalizarVenda}>Finalizar Venda</button>
+      </div>
     </div>
   );
 }
+
+const styles = {
+  page: {
+    background: "#0f172a",
+    minHeight: "100vh",
+    padding: 20,
+    color: "#fff",
+    fontFamily: "Arial"
+  },
+  container: {
+    maxWidth: 900,
+    margin: "0 auto"
+  },
+  title: {
+    textAlign: "center",
+    marginBottom: 20
+  },
+  card: {
+    background: "#1e293b",
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 20,
+    boxShadow: "0 10px 25px rgba(0,0,0,0.3)"
+  },
+  row: {
+    display: "flex",
+    gap: 10,
+    marginBottom: 10
+  },
+  input: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 8,
+    border: "none"
+  },
+  inputFull: {
+    width: "100%",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 10
+  },
+  button: {
+    padding: 10,
+    background: "#3b82f6",
+    border: "none",
+    color: "#fff",
+    borderRadius: 8,
+    cursor: "pointer"
+  },
+  buttonGreen: {
+    padding: 10,
+    background: "#22c55e",
+    border: "none",
+    color: "#fff",
+    borderRadius: 8,
+    cursor: "pointer",
+    width: "100%"
+  },
+  list: {
+    marginTop: 10
+  },
+  item: {
+    padding: 8,
+    borderBottom: "1px solid #334155"
+  },
+  result: {
+    margin: "10px 0",
+    padding: 10,
+    background: "#334155",
+    borderRadius: 8,
+    display: "flex",
+    justifyContent: "space-between"
+  },
+  smallBtn: {
+    background: "#f59e0b",
+    border: "none",
+    padding: "5px 10px",
+    borderRadius: 6,
+    cursor: "pointer"
+  }
+};
