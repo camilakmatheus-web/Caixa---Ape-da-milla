@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { auth, provider } from "./firebase";
-import { signInWithPopup, signOut } from "firebase/auth";
 
 const API = "https://caixa-ape-da-milla.onrender.com";
 
@@ -46,16 +44,9 @@ export default function App() {
     alert("Conta criada");
   };
 
-  // ================= LOGIN GOOGLE =================
-  const loginGoogle = async () => {
-    const res = await signInWithPopup(auth, provider);
-    const user = res.user;
-
-    // aqui você pode futuramente mandar pro backend
-    setUser(user);
-
-    // simula login (até integrar backend)
-    setToken("google-logado");
+  // ================= LOGIN GOOGLE (DESATIVADO TEMPORARIAMENTE) =================
+  const loginGoogle = () => {
+    alert("Firebase ainda não configurado. Reative depois.");
   };
 
   // ================= CARREGAR =================
@@ -155,7 +146,6 @@ export default function App() {
 
         <hr />
 
-        {/* LOGIN GOOGLE */}
         <button onClick={loginGoogle}>
           🔐 Entrar com Google
         </button>
@@ -168,13 +158,10 @@ export default function App() {
     <div style={{ padding: 20, fontFamily: "Arial" }}>
       <h1>💰 Sistema Caixa</h1>
 
-      {user && <p>👤 {user.displayName}</p>}
-
       <button onClick={() => {
         localStorage.removeItem("token");
         setToken("");
         setUser(null);
-        signOut(auth);
       }}>
         Sair
       </button>
