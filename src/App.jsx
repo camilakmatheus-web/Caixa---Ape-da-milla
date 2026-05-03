@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { auth, provider } from "./firebase";
 import { signInWithPopup, signOut } from "firebase/auth";
+import jsPDF from "jspdf";
 
 const API = "https://caixa-ape-da-milla.onrender.com";
 
@@ -330,39 +331,73 @@ const totalPendentes = pendentes.reduce(
 const clientesPendentes = new Set(
   pendentes.map(p => p.cliente)
 ).size;
+// ================= EXTRATO PDF =================
 const baixarExtrato = () => {
-  const extrato = {
-    dataGeracao: new Date().toISOString(),
+  const doc = new jsPDF();
 
-    resumo: {
-      faturamento,
-      lucro,
-      investimento,
-      lucroEstoque,
-      totalPendentes,
-      clientesPendentes
-    },
+  let y = 10;
 
-    vendas,
-    pendentes,
-    produtos,
-    clientes
-  };
+  doc.setFontSize(16);
+  doc.text("Extrato Completo - MAGNUS", 10, y);
 
-  const blob = new Blob(
-    [JSON.stringify(extrato, null, 2)],
-    { type: "application/json" }
-  );
+  y += 10;
 
-  const url = URL.createObjectURL(blob);
+  doc.setFontSize(10);
+  doc.text(`Data: ${new Date().toLocaleString()}`, 10, y);
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `extrato-${Date.now()}.json`;
-  a.click();
+  y += 10;
 
-  URL.revokeObjectURL(url);
+  // RESUMO
+  doc.text(`Faturamento: R$ ${faturamento.toFixed(2)}`, 10, y);
+  y += 6;
+
+  doc.text(`Lucro: R$ ${lucro.toFixed(2)}`, 10, y);
+  y += 6;
+
+  doc.text(`Investimento: R$ ${investimento.toFixed(2)}`, 10, y);
+  y += 6;
+
+  doc.text(`Pendentes: R$ ${totalPendentes.toFixed(2)}`, 10, y);
+
+  y += 10;
+
+  // VENDAS
+  doc.text("Vendas:", 10, y);
+  y += 6;
+
+  vendas.slice(0, 10).forEach(v => {
+    doc.text(`R$ ${v.total} - ${v.data}`, 10, y);
+    y += 5;
+  });
+
+  y += 10;
+
+  // PENDENTES
+  doc.text("Pendentes:", 10, y);
+  y += 6;
+
+  pendentes.slice(0, 10).forEach(v => {
+    doc.text(`R$ ${v.total} - ${v.cliente}`, 10, y);
+    y += 5;
+  });
+
+  y += 10;
+
+  // PRODUTOS
+  doc.text("Produtos:", 10, y);
+  y += 6;
+
+  produtos.slice(0, 10).forEach(p => {
+    doc.text(`${p.nome} - ${p.estoque} un`, 10, y);
+    y += 5;
+  });
+
+
+  // ===== SALVAR PDF =====
+  doc.save(`extrato-${Date.now()}.pdf`);
 };
+
+
 const cardStyle = {
   background: "#1a1a2e",
   padding: 20,
