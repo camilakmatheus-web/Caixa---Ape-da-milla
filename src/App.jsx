@@ -27,6 +27,10 @@ export default function App() {
   const [cliente, setCliente] = useState("");
   const [pagamento, setPagamento] = useState("dinheiro");
   const [modoVenda, setModoVenda] = useState("normal"); // normal | pendente
+  const [precoVenda, setPrecoVenda] = useState("");
+  const [imagem, setImagem] = useState("");
+  const [subTab, setSubTab] = useState("cadastro");
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null); 
 
   // ================= LOGIN =================
   const login = async () => {
@@ -97,29 +101,31 @@ export default function App() {
   }, [produtos, vendas, pendentes]);
 
   // ================= PRODUTOS =================
-  const adicionarProduto = () => {
-  if (!nome || !preco || !estoque) return;
+const adicionarProduto = () => {
+  if (!nome || !preco || !precoVenda || !estoque) return;
 
   setProdutos(prev => [
     ...prev,
     {
       id: Date.now(),
       nome,
-      preco: Number(nome), // compra (ajuste depois se quiser separar melhor)
-      precoVenda: Number(preco),
-      estoque: Number(estoque)
+      preco: Number(preco), // ✅ PREÇO DE COMPRA CORRIGIDO
+      precoVenda: Number(precoVenda), // ✅ VENDA SEPARADO
+      estoque: Number(estoque),
+      imagem // ✅ IMAGEM DO PRODUTO
     }
   ]);
 
   setNome("");
   setPreco("");
+  setPrecoVenda("");
   setEstoque("");
+  setImagem("");
 };
 
-  const produto = produtos.find(p =>
-    p.nome?.toLowerCase().includes(busca.toLowerCase())
-  );
-
+const produto = produtos.find(p =>
+  p.nome?.toLowerCase().includes(busca.toLowerCase())
+);
   // ================= CARRINHO =================
   const addCarrinho = () => {
     if (!produto || produto.estoque <= 0) return;
@@ -175,39 +181,67 @@ export default function App() {
   );
 
   // ================= FINALIZAR (VENDA + PENDENTE) =================
-  const finalizar = () => {
-    if (!carrinho.length) return;
+ // ================= FINALIZAR (VENDA + PENDENTE) =================
+const finalizar = () => {
+  if (!carrinho.length) return;
 
-    const agora = new Date();
+  const agora = new Date();
+  const timestamp = Date.now();
 
-    const venda = {
-      id: Date.now(),
-      cliente: cliente || "Sem nome",
-      pagamento: modoVenda === "normal" ? pagamento : null,
-      modo: modoVenda,
-      itens: carrinho,
-      total,
-      data: agora.toISOString().split("T")[0],
-      hora: agora.toTimeString().slice(0, 5),
-      timestamp: Date.now()
-    };
-
-    if (modoVenda === "pendente") {
-      setPendentes(prev => [...prev, venda]);
-    } else {
-      setVendas(prev => [...prev, venda]);
-    }
-
-    setCarrinho([]);
-    setCliente("");
-    setPagamento("dinheiro");
-    setModoVenda("normal");
+  const venda = {
+    id: timestamp,
+    cliente: cliente || "Sem nome",
+    pagamento: modoVenda === "normal" ? pagamento : null,
+    modo: modoVenda,
+    itens: carrinho,
+    total,
+    data: agora.toISOString().split("T")[0],
+    hora: agora.toTimeString().slice(0, 5),
+    timestamp
   };
 
-  const hoje = new Date().toISOString().split("T")[0];
-  const vendasHoje = vendas.filter(v => v.data === hoje);
-  const totalHoje = vendasHoje.reduce((soma, v) => soma + v.total, 0);
+  if (modoVenda === "pendente") {
+    setPendentes(prev => [...prev, venda]);
+  } else {
+    setVendas(prev => [...prev, venda]);
+  }
 
+  // 🔄 RESET
+  setCarrinho([]);
+  setCliente("");
+  setPagamento("dinheiro");
+  setModoVenda("normal");
+};
+
+// ================= MARCAR COMO PAGO =================
+const marcarComoPago = (venda) => {
+  // remove dos pendentes
+  setPendentes(prev => prev.filter(p => p.id !== venda.id));
+
+  // adiciona como venda normal
+  setVendas(prev => [
+    ...prev,
+    {
+      ...venda,
+      modo: "normal",
+      pagamento: "pendente_pago"
+    }
+  ]);
+};
+
+// ================= REMOVER PENDENTE =================
+const removerPendente = (id) => {
+  setPendentes(prev => prev.filter(p => p.id !== id));
+};
+// 📊 RESUMO DO DIA
+const hoje = new Date().toISOString().split("T")[0];
+
+const vendasHoje = vendas.filter(v => v.data === hoje);
+
+const totalHoje = vendasHoje.reduce(
+  (soma, v) => soma + v.total,
+  0
+);
   // ================= LOGIN =================
   if (!token) {
     return (
@@ -317,94 +351,193 @@ export default function App() {
   <div>
     <h2>📦 Produtos</h2>
 
-    <input
-      placeholder="Nome"
-      value={nome}
-      onChange={e => setNome(e.target.value)}
-    />
+    {/* SUB MENU */}
+    <div style={{ marginBottom: 20 }}>
+      <button onClick={() => setSubTab("cadastro")}>➕ Cadastrar</button>
+      <button onClick={() => setSubTab("lista")}>📦 Produtos adicionados</button>
+    </div>
 
-    <input
-      placeholder="Preço de compra"
-      value={preco}
-      onChange={e => setPreco(e.target.value)}
-    />
+    {/* ================= CADASTRO ================= */}
+    {subTab === "cadastro" && (
+      <div>
+        <div>
+          <input
+            placeholder="Nome"
+            value={nome}
+            onChange={e => setNome(e.target.value)}
+          />
+        </div>
 
-    <input
-      placeholder="Preço de venda"
-      onChange={e => setEstoque(e.target.value)}
-    />
+        <div>
+          <span>R$ </span>
+          <input
+            placeholder="Preço de compra"
+            value={preco}
+            onChange={e => setPreco(e.target.value)}
+          />
+        </div>
 
-    <input
-      placeholder="Estoque"
-      value={estoque}
-      onChange={e => setEstoque(e.target.value)}
-    />
+        <div>
+          <span>R$ </span>
+          <input
+            placeholder="Preço de venda"
+            value={precoVenda}
+            onChange={e => setPrecoVenda(e.target.value)}
+          />
+        </div>
 
-    <button onClick={adicionarProduto}>
-      ➕ Adicionar produto
-    </button>
+        <div>
+          <input
+            placeholder="Estoque"
+            value={estoque}
+            onChange={e => setEstoque(e.target.value)}
+          />
+        </div>
 
-    <hr />
+        <div>
+          <input
+            type="file"
+            onChange={e => {
+              const file = e.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  setImagem(reader.result);
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+          />
+        </div>
 
-    {/* LISTA PROFISSIONAL */}
-    {produtos.map(p => {
-      const lucroUnit = (Number(p.precoVenda || 0) - Number(p.preco || 0));
-      const lucroTotal = lucroUnit * Number(p.estoque || 0);
+        <button onClick={adicionarProduto}>
+          ➕ Adicionar produto
+        </button>
+      </div>
+    )}
+    {/* ================= LISTA ================= */}
+ {subTab === "lista" && (
+  <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+    <div style={{ display: "flex", gap: 20 }}>
 
-      return (
+      <div style={{ width: 200 }}>
+        {produtos.map(p => (
+          <div
+            key={p.id}
+            style={{
+              padding: 10,
+              border: "1px solid #333",
+              marginBottom: 10,
+              cursor: "pointer"
+            }}
+            onClick={() => setProdutoSelecionado(p)}
+          >
+            {p.nome}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ flex: 1 }}>
+        {produtoSelecionado ? (
+          <div>
+            <h3>{produtoSelecionado.nome}</h3>
+
+            {produtoSelecionado.imagem && (
+              <img
+                src={produtoSelecionado.imagem}
+                style={{ width: 200, borderRadius: 10 }}
+              />
+            )}
+
+            <p>💰 Compra: R$ {produtoSelecionado.preco}</p>
+            <p>💸 Venda: R$ {produtoSelecionado.precoVenda}</p>
+            <p>📦 Estoque: {produtoSelecionado.estoque}</p>
+
+            <p>
+              📊 Lucro unit: R${" "}
+              {(produtoSelecionado.precoVenda - produtoSelecionado.preco).toFixed(2)}
+            </p>
+
+            <p>
+              📈 Lucro total: R${" "}
+              {(
+                (produtoSelecionado.precoVenda - produtoSelecionado.preco) *
+                produtoSelecionado.estoque
+              ).toFixed(2)}
+            </p>
+          </div>
+        ) : (
+          <p>Selecione um produto</p>
+        )}
+      </div>
+
+    </div>
+
+    <div style={{ borderTop: "2px solid #333", paddingTop: 20 }}>
+      <h3>📊 Estatísticas gerais</h3>
+
+      <p>
+        💰 Total investido: R${" "}
+        {produtos.reduce((s, p) => s + p.preco * p.estoque, 0).toFixed(2)}
+      </p>
+
+      <p>
+        💸 Valor potencial de venda: R${" "}
+        {produtos.reduce((s, p) => s + (p.precoVenda || 0) * p.estoque, 0).toFixed(2)}
+      </p>
+
+      <p>
+        📈 Lucro total estimado: R${" "}
+        {produtos.reduce(
+          (s, p) =>
+            s + ((p.precoVenda || 0) - p.preco) * p.estoque,
+          0
+        ).toFixed(2)}
+      </p>
+    </div>
+
+  </div>
+)}
+
+</div>
+)}  // 👈 🔥 ISSO AQUI FALTAVA
+{tab === "pendentes" && (
+  <div>
+    <h2>📌 Vendas Pendentes</h2>
+
+    {pendentes.length === 0 ? (
+      <p>Nenhuma venda pendente</p>
+    ) : (
+      pendentes.map(p => (
         <div
           key={p.id}
           style={{
-            padding: 10,
             border: "1px solid #333",
+            padding: 10,
             marginBottom: 10,
             borderRadius: 8
           }}
         >
-          <h3>{p.nome}</h3>
+          <p>👤 Cliente: {p.cliente}</p>
+          <p>💰 Valor: R$ {p.total.toFixed(2)}</p>
+          <p>📅 {p.data} - {p.hora}</p>
 
-          <p>💰 Compra: R$ {p.preco}</p>
-          <p>💸 Venda: R$ {p.precoVenda || 0}</p>
-          <p>📦 Estoque: {p.estoque}</p>
+          <button onClick={() => marcarComoPago(p)}>
+            ✅ Marcar como pago
+          </button>
 
-          <p>📊 Lucro unit: R$ {lucroUnit.toFixed(2)}</p>
-          <p>📈 Lucro total: R$ {lucroTotal.toFixed(2)}</p>
+          <button onClick={() => removerPendente(p.id)}>
+            ❌ Excluir
+          </button>
         </div>
-      );
-    })}
-
-    <hr />
-
-    {/* RESUMO GERAL */}
-    <h3>📊 Resumo do estoque</h3>
-
-    <p>
-      💰 Valor total de compra: R${" "}
-      {produtos.reduce((s, p) => s + p.preco * p.estoque, 0).toFixed(2)}
-    </p>
-
-    <p>
-      💸 Valor total de venda: R${" "}
-      {produtos.reduce((s, p) => s + (p.precoVenda || 0) * p.estoque, 0).toFixed(2)}
-    </p>
-
-    <p>
-      📈 Lucro total geral: R${" "}
-      {produtos.reduce(
-        (s, p) =>
-          s +
-          ((p.precoVenda || 0) - p.preco) * p.estoque,
-        0
-      ).toFixed(2)}
-    </p>
+      ))
+    )}
   </div>
 )}
+{tab === "stats" && <h2>Estatísticas</h2>}
+{tab === "extrato" && <h2>Extrato</h2>}
 
-        {tab === "pendentes" && <h2>Pendentes</h2>}
-        {tab === "stats" && <h2>Estatísticas</h2>}
-        {tab === "extrato" && <h2>Extrato</h2>}
-
-      </div>
     </div>
-  );
+  </div>
+);
 }
