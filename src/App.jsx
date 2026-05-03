@@ -30,7 +30,7 @@ export default function App() {
   const [precoVenda, setPrecoVenda] = useState("");
   const [imagem, setImagem] = useState("");
   const [subTab, setSubTab] = useState("cadastro");
-  const [produtoSelecionado, setProdutoSelecionado] = useState(null); }
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null); 
 
   // ================= LOGIN =================
   const login = async () => {
@@ -480,4 +480,4 @@ const produto = produtos.find(p =>
 
 </div>
 </div>
-);
+); }
