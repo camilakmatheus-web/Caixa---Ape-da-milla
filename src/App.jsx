@@ -330,6 +330,39 @@ const totalPendentes = pendentes.reduce(
 const clientesPendentes = new Set(
   pendentes.map(p => p.cliente)
 ).size;
+const baixarExtrato = () => {
+  const extrato = {
+    dataGeracao: new Date().toISOString(),
+
+    resumo: {
+      faturamento,
+      lucro,
+      investimento,
+      lucroEstoque,
+      totalPendentes,
+      clientesPendentes
+    },
+
+    vendas,
+    pendentes,
+    produtos,
+    clientes
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(extrato, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `extrato-${Date.now()}.json`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+};
 const cardStyle = {
   background: "#1a1a2e",
   padding: 20,
@@ -756,7 +789,31 @@ const cardStyle = {
 
   </div>
 )}
-{tab === "extrato" && <h2>Extrato</h2>}
+{tab === "extrato" && (
+  <div>
+    <h2>📄 Extrato do Sistema</h2>
+
+    <p style={{ marginBottom: 20 }}>
+      Baixe um relatório completo com todas as informações do sistema:
+      vendas, pendentes, produtos e clientes.
+    </p>
+
+    <button
+      onClick={baixarExtrato}
+      style={{
+        padding: "15px 25px",
+        background: "#22c55e",
+        color: "#fff",
+        border: "none",
+        borderRadius: 10,
+        fontSize: 16,
+        cursor: "pointer"
+      }}
+    >
+      ⬇️ Baixar Extrato Completo
+    </button>
+  </div>
+)}
 
     </div>
   </div>
