@@ -99,10 +99,6 @@ export default function App() {
   }, [produtos, vendas, pendentes]);
 
   // ================= PRODUTOS =================
-  // ================= PRODUTOS =================
-const [precoVenda, setPrecoVenda] = useState("");
-const [imagem, setImagem] = useState("");
-
 const adicionarProduto = () => {
   if (!nome || !preco || !precoVenda || !estoque) return;
 
