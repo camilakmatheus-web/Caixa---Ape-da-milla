@@ -256,6 +256,7 @@ const adicionarCliente = () => {
   setNovoCliente("");
 };
 // 📊 RESUMO DO DIA
+// 📊 RESUMO DO DIA
 const hoje = new Date().toISOString().split("T")[0];
 
 const vendasHoje = vendas.filter(v => v.data === hoje);
@@ -264,6 +265,71 @@ const totalHoje = vendasHoje.reduce(
   (soma, v) => soma + v.total,
   0
 );
+
+// 🔥 FILTRO DE PERÍODO (COLE AQUI)
+const filtrarVendas = () => {
+  const hoje = new Date();
+
+  return vendas.filter(v => {
+    const dataVenda = new Date(v.data);
+
+    const diff = (hoje - dataVenda) / (1000 * 60 * 60 * 24);
+
+    if (periodo === "hoje") return diff < 1;
+    if (periodo === "7d") return diff <= 7;
+    if (periodo === "14d") return diff <= 14;
+    if (periodo === "1m") return diff <= 30;
+    if (periodo === "3m") return diff <= 90;
+    if (periodo === "1y") return diff <= 365;
+
+    return true;
+  });
+};
+
+// 🔥 RESULTADO FILTRADO
+const vendasFiltradas = filtrarVendas();
+// 💰 FATURAMENTO
+const faturamento = vendasFiltradas.reduce(
+  (soma, v) => soma + (Number(v.total) || 0),
+  0
+);
+
+// 💸 LUCRO
+const lucro = vendasFiltradas.reduce((soma, v) => {
+  const lucroVenda = v.itens.reduce((acc, item) => {
+    const lucroUnit =
+      (item.precoVenda || 0) - (item.preco || 0);
+    return acc + lucroUnit * (item.qtd || 1);
+  }, 0);
+
+  return soma + lucroVenda;
+}, 0);
+
+// 📦 INVESTIMENTO (produtos em estoque)
+const investimento = produtos.reduce(
+  (s, p) => s + (p.preco || 0) * (p.estoque || 0),
+  0
+);
+
+// 💸 VALOR DE VENDA ESTOQUE
+const valorEstoqueVenda = produtos.reduce(
+  (s, p) => s + (p.precoVenda || 0) * (p.estoque || 0),
+  0
+);
+
+// 📈 LUCRO POTENCIAL
+const lucroEstoque = valorEstoqueVenda - investimento;
+
+// 📌 PENDENTES
+const totalPendentes = pendentes.reduce(
+  (s, v) => s + (v.total || 0),
+  0
+);
+
+// 👥 CLIENTES PENDENTES
+const clientesPendentes = new Set(
+  pendentes.map(p => p.cliente)
+).size;
   // ================= LOGIN =================
   if (!token) {
     return (
@@ -601,7 +667,88 @@ const totalHoje = vendasHoje.reduce(
     </h3>
   </div>
 )}
-{tab === "stats" && <h2>Estatísticas</h2>}
+{tab === "stats" && (
+  <div>
+    <h2 style={{ marginBottom: 20 }}>📊 Estatísticas</h2>
+
+    {/* FILTRO */}
+    <div style={{ marginBottom: 20, display: "flex", gap: 10 }}>
+      {["hoje","7d","14d","1m","3m","1y"].map(p => (
+        <button
+          key={p}
+          onClick={() => setPeriodo(p)}
+          style={{
+            padding: "8px 12px",
+            background: periodo === p ? "#a855f7" : "#222",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            cursor: "pointer"
+          }}
+        >
+          {p}
+        </button>
+      ))}
+    </div>
+
+    {/* CARDS */}
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+      gap: 20
+    }}>
+
+      {/* FATURAMENTO */}
+      <div style={cardStyle}>
+        <p>💰 Faturamento</p>
+        <h2>R$ {faturamento.toFixed(2)}</h2>
+      </div>
+
+      {/* LUCRO */}
+      <div style={cardStyle}>
+        <p>💸 Lucro</p>
+        <h2 style={{ color: lucro >= 0 ? "#22c55e" : "#ef4444" }}>
+          R$ {lucro.toFixed(2)}
+        </h2>
+      </div>
+
+      {/* INVESTIMENTO */}
+      <div style={cardStyle}>
+        <p>📦 Investimento</p>
+        <h2>R$ {investimento.toFixed(2)}</h2>
+      </div>
+
+      {/* LUCRO ESTOQUE */}
+      <div style={cardStyle}>
+        <p>📈 Lucro potencial</p>
+        <h2>R$ {lucroEstoque.toFixed(2)}</h2>
+      </div>
+
+    </div>
+
+    <hr style={{ margin: "30px 0" }} />
+
+    {/* PENDENTES */}
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+      gap: 20
+    }}>
+
+      <div style={cardStyle}>
+        <p>📌 Total pendente</p>
+        <h2>R$ {totalPendentes.toFixed(2)}</h2>
+      </div>
+
+      <div style={cardStyle}>
+        <p>👥 Clientes devendo</p>
+        <h2>{clientesPendentes}</h2>
+      </div>
+
+    </div>
+
+  </div>
+)}
 {tab === "extrato" && <h2>Extrato</h2>}
 
     </div>
