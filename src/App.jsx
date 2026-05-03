@@ -31,6 +31,9 @@ export default function App() {
   const [imagem, setImagem] = useState("");
   const [subTab, setSubTab] = useState("cadastro");
   const [produtoSelecionado, setProdutoSelecionado] = useState(null); 
+  const [clientesPendentes, setClientesPendentes] = useState([]);
+  const [nomeClientePendente, setNomeClientePendente] = useState("");
+  const [clienteSelecionado, setClienteSelecionado] = useState(null);
 
   // ================= LOGIN =================
   const login = async () => {
@@ -181,8 +184,7 @@ const produto = produtos.find(p =>
   );
 
   // ================= FINALIZAR (VENDA + PENDENTE) =================
- // ================= FINALIZAR (VENDA + PENDENTE) =================
-const finalizar = () => {
+ const finalizar = () => {
   if (!carrinho.length) return;
 
   const agora = new Date();
@@ -200,9 +202,34 @@ const finalizar = () => {
     timestamp
   };
 
+  // ✅ VENDA PENDENTE → VAI PRO CLIENTE
   if (modoVenda === "pendente") {
-    setPendentes(prev => [...prev, venda]);
+    if (!cliente) {
+      alert("Digite o nome do cliente!");
+      return;
+    }
+
+    const clienteExiste = clientesPendentes.find(
+      c => c.nome.toLowerCase() === cliente.toLowerCase()
+    );
+
+    if (!clienteExiste) {
+      alert("Cliente não cadastrado na aba pendentes!");
+      return;
+    }
+
+    setClientesPendentes(prev =>
+      prev.map(c =>
+        c.nome.toLowerCase() === cliente.toLowerCase()
+          ? {
+              ...c,
+              total: c.total + total
+            }
+          : c
+      )
+    );
   } else {
+    // ✅ VENDA NORMAL
     setVendas(prev => [...prev, venda]);
   }
 
@@ -212,36 +239,6 @@ const finalizar = () => {
   setPagamento("dinheiro");
   setModoVenda("normal");
 };
-
-// ================= MARCAR COMO PAGO =================
-const marcarComoPago = (venda) => {
-  // remove dos pendentes
-  setPendentes(prev => prev.filter(p => p.id !== venda.id));
-
-  // adiciona como venda normal
-  setVendas(prev => [
-    ...prev,
-    {
-      ...venda,
-      modo: "normal",
-      pagamento: "pendente_pago"
-    }
-  ]);
-};
-
-// ================= REMOVER PENDENTE =================
-const removerPendente = (id) => {
-  setPendentes(prev => prev.filter(p => p.id !== id));
-};
-// 📊 RESUMO DO DIA
-const hoje = new Date().toISOString().split("T")[0];
-
-const vendasHoje = vendas.filter(v => v.data === hoje);
-
-const totalHoje = vendasHoje.reduce(
-  (soma, v) => soma + v.total,
-  0
-);
   // ================= LOGIN =================
   if (!token) {
     return (
