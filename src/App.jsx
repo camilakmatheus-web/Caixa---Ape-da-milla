@@ -531,9 +531,11 @@ const totalHoje = vendasHoje.reduce(
     )}
   </div>
 )}
+
 {tab === "stats" && <h2>Estatísticas</h2>}
 {tab === "extrato" && <h2>Extrato</h2>}
 
-</div>
-</div>
-); }
+    </div> {/* FECHA CONTEÚDO DIREITA */}
+  </div>   {/* FECHA CONTAINER GERAL */}
+;        {/* FECHA RETURN */}
+         {/* FECHA FUNÇÃO APP */} }
