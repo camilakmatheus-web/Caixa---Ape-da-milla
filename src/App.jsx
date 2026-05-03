@@ -27,6 +27,8 @@ export default function App() {
   const [cliente, setCliente] = useState("");
   const [pagamento, setPagamento] = useState("dinheiro");
   const [modoVenda, setModoVenda] = useState("normal"); // normal | pendente
+  const [precoVenda, setPrecoVenda] = useState("");
+  const [imagem, setImagem] = useState("");
 
   // ================= LOGIN =================
   const login = async () => {
@@ -97,29 +99,35 @@ export default function App() {
   }, [produtos, vendas, pendentes]);
 
   // ================= PRODUTOS =================
-  const adicionarProduto = () => {
-  if (!nome || !preco || !estoque) return;
+  // ================= PRODUTOS =================
+const [precoVenda, setPrecoVenda] = useState("");
+const [imagem, setImagem] = useState("");
+
+const adicionarProduto = () => {
+  if (!nome || !preco || !precoVenda || !estoque) return;
 
   setProdutos(prev => [
     ...prev,
     {
       id: Date.now(),
       nome,
-      preco: Number(nome), // compra (ajuste depois se quiser separar melhor)
-      precoVenda: Number(preco),
-      estoque: Number(estoque)
+      preco: Number(preco), // ✅ PREÇO DE COMPRA CORRIGIDO
+      precoVenda: Number(precoVenda), // ✅ VENDA SEPARADO
+      estoque: Number(estoque),
+      imagem // ✅ IMAGEM DO PRODUTO
     }
   ]);
 
   setNome("");
   setPreco("");
+  setPrecoVenda("");
   setEstoque("");
+  setImagem("");
 };
 
-  const produto = produtos.find(p =>
-    p.nome?.toLowerCase().includes(busca.toLowerCase())
-  );
-
+const produto = produtos.find(p =>
+  p.nome?.toLowerCase().includes(busca.toLowerCase())
+);
   // ================= CARRINHO =================
   const addCarrinho = () => {
     if (!produto || produto.estoque <= 0) return;
@@ -318,28 +326,42 @@ export default function App() {
     <h2>📦 Produtos</h2>
 
     <input
-      placeholder="Nome"
-      value={nome}
-      onChange={e => setNome(e.target.value)}
-    />
+  placeholder="Nome"
+  value={nome}
+  onChange={e => setNome(e.target.value)}
+/>
 
-    <input
-      placeholder="Preço de compra"
-      value={preco}
-      onChange={e => setPreco(e.target.value)}
-    />
+<input
+  placeholder="Preço de compra"
+  value={preco}
+  onChange={e => setPreco(e.target.value)}
+/>
 
-    <input
-      placeholder="Preço de venda"
-      onChange={e => setEstoque(e.target.value)}
-    />
+<input
+  placeholder="Preço de venda"
+  value={precoVenda}
+  onChange={e => setPrecoVenda(e.target.value)}
+/>
 
-    <input
-      placeholder="Estoque"
-      value={estoque}
-      onChange={e => setEstoque(e.target.value)}
-    />
+<input
+  placeholder="Estoque"
+  value={estoque}
+  onChange={e => setEstoque(e.target.value)}
+/>
 
+<input
+  type="file"
+  onChange={e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagem(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }}
+/>
     <button onClick={adicionarProduto}>
       ➕ Adicionar produto
     </button>
