@@ -29,6 +29,8 @@ export default function App() {
   const [modoVenda, setModoVenda] = useState("normal"); // normal | pendente
   const [precoVenda, setPrecoVenda] = useState("");
   const [imagem, setImagem] = useState("");
+  const [subTab, setSubTab] = useState("cadastro");
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
 
   // ================= LOGIN =================
   const login = async () => {
@@ -321,102 +323,132 @@ const produto = produtos.find(p =>
   <div>
     <h2>📦 Produtos</h2>
 
-    <input
-  placeholder="Nome"
-  value={nome}
-  onChange={e => setNome(e.target.value)}
-/>
+    {/* SUB MENU */}
+    <div style={{ marginBottom: 20 }}>
+      <button onClick={() => setSubTab("cadastro")}>➕ Cadastrar</button>
+      <button onClick={() => setSubTab("lista")}>📦 Produtos adicionados</button>
+    </div>
 
-<input
-  placeholder="Preço de compra"
-  value={preco}
-  onChange={e => setPreco(e.target.value)}
-/>
-
-<input
-  placeholder="Preço de venda"
-  value={precoVenda}
-  onChange={e => setPrecoVenda(e.target.value)}
-/>
-
-<input
-  placeholder="Estoque"
-  value={estoque}
-  onChange={e => setEstoque(e.target.value)}
-/>
-
-<input
-  type="file"
-  onChange={e => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagem(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  }}
-/>
-    <button onClick={adicionarProduto}>
-      ➕ Adicionar produto
-    </button>
-
-    <hr />
-
-    {/* LISTA PROFISSIONAL */}
-    {produtos.map(p => {
-      const lucroUnit = (Number(p.precoVenda || 0) - Number(p.preco || 0));
-      const lucroTotal = lucroUnit * Number(p.estoque || 0);
-
-      return (
-        <div
-          key={p.id}
-          style={{
-            padding: 10,
-            border: "1px solid #333",
-            marginBottom: 10,
-            borderRadius: 8
-          }}
-        >
-          <h3>{p.nome}</h3>
-
-          <p>💰 Compra: R$ {p.preco}</p>
-          <p>💸 Venda: R$ {p.precoVenda || 0}</p>
-          <p>📦 Estoque: {p.estoque}</p>
-
-          <p>📊 Lucro unit: R$ {lucroUnit.toFixed(2)}</p>
-          <p>📈 Lucro total: R$ {lucroTotal.toFixed(2)}</p>
+    {/* ================= CADASTRO ================= */}
+    {subTab === "cadastro" && (
+      <div>
+        <div>
+          <input
+            placeholder="Nome"
+            value={nome}
+            onChange={e => setNome(e.target.value)}
+          />
         </div>
-      );
-    })}
 
-    <hr />
+        <div>
+          <span>R$ </span>
+          <input
+            placeholder="Preço de compra"
+            value={preco}
+            onChange={e => setPreco(e.target.value)}
+          />
+        </div>
 
-    {/* RESUMO GERAL */}
-    <h3>📊 Resumo do estoque</h3>
+        <div>
+          <span>R$ </span>
+          <input
+            placeholder="Preço de venda"
+            value={precoVenda}
+            onChange={e => setPrecoVenda(e.target.value)}
+          />
+        </div>
 
-    <p>
-      💰 Valor total de compra: R${" "}
-      {produtos.reduce((s, p) => s + p.preco * p.estoque, 0).toFixed(2)}
-    </p>
+        <div>
+          <input
+            placeholder="Estoque"
+            value={estoque}
+            onChange={e => setEstoque(e.target.value)}
+          />
+        </div>
 
-    <p>
-      💸 Valor total de venda: R${" "}
-      {produtos.reduce((s, p) => s + (p.precoVenda || 0) * p.estoque, 0).toFixed(2)}
-    </p>
+        <div>
+          <input
+            type="file"
+            onChange={e => {
+              const file = e.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  setImagem(reader.result);
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+          />
+        </div>
 
-    <p>
-      📈 Lucro total geral: R${" "}
-      {produtos.reduce(
-        (s, p) =>
-          s +
-          ((p.precoVenda || 0) - p.preco) * p.estoque,
-        0
-      ).toFixed(2)}
-    </p>
+        <button onClick={adicionarProduto}>
+          ➕ Adicionar produto
+        </button>
+      </div>
+    )}
+
+    {/* ================= LISTA ================= */}
+    {subTab === "lista" && (
+      <div style={{ display: "flex", gap: 20 }}>
+
+        {/* LISTA LATERAL */}
+        <div style={{ width: 200 }}>
+          {produtos.map(p => (
+            <div
+              key={p.id}
+              style={{
+                padding: 10,
+                border: "1px solid #333",
+                marginBottom: 10,
+                cursor: "pointer"
+              }}
+              onClick={() => setProdutoSelecionado(p)}
+            >
+              {p.nome}
+            </div>
+          ))}
+        </div>
+
+        {/* DETALHES */}
+        <div style={{ flex: 1 }}>
+          {produtoSelecionado ? (
+            <div>
+              <h3>{produtoSelecionado.nome}</h3>
+
+              {produtoSelecionado.imagem && (
+                <img
+                  src={produtoSelecionado.imagem}
+                  style={{ width: 200, borderRadius: 10 }}
+                />
+              )}
+
+              <p>💰 Compra: R$ {produtoSelecionado.preco}</p>
+              <p>💸 Venda: R$ {produtoSelecionado.precoVenda}</p>
+              <p>📦 Estoque: {produtoSelecionado.estoque}</p>
+
+              <p>
+                📊 Lucro unit: R${" "}
+                {(produtoSelecionado.precoVenda - produtoSelecionado.preco).toFixed(2)}
+              </p>
+
+              <p>
+                📈 Lucro total: R${" "}
+                {(
+                  (produtoSelecionado.precoVenda - produtoSelecionado.preco) *
+                  produtoSelecionado.estoque
+                ).toFixed(2)}
+              </p>
+            </div>
+          ) : (
+            <p>Selecione um produto</p>
+          )}
+        </div>
+      </div>
+    )}
   </div>
 )}
+
 
         {tab === "pendentes" && <h2>Pendentes</h2>}
         {tab === "stats" && <h2>Estatísticas</h2>}
