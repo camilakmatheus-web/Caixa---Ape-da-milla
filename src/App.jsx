@@ -330,6 +330,13 @@ const totalPendentes = pendentes.reduce(
 const clientesPendentes = new Set(
   pendentes.map(p => p.cliente)
 ).size;
+const cardStyle = {
+  background: "#1a1a2e",
+  padding: 20,
+  borderRadius: 12,
+  color: "#fff",
+  boxShadow: "0 4px 20px rgba(0,0,0,0.3)"
+};
   // ================= LOGIN =================
   if (!token) {
     return (
