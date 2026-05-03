@@ -17,18 +17,16 @@ export default function App() {
   const [pendentes, setPendentes] = useState([]);
 
   const [nome, setNome] = useState("");
-  const [precoCompra, setPrecoCompra] = useState("");
-  const [precoVenda, setPrecoVenda] = useState("");
+  const [preco, setPreco] = useState("");
   const [estoque, setEstoque] = useState("");
-
-  const [imagem, setImagem] = useState("");
 
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
 
+  // 🔥 NIVEL 3
   const [cliente, setCliente] = useState("");
   const [pagamento, setPagamento] = useState("dinheiro");
-  const [modoVenda, setModoVenda] = useState("normal");
+  const [modoVenda, setModoVenda] = useState("normal"); // normal | pendente
 
   // ================= LOGIN =================
   const login = async () => {
@@ -53,6 +51,7 @@ export default function App() {
     alert("Conta criada");
   };
 
+  // ================= GOOGLE LOGIN =================
   const loginGoogle = async () => {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
@@ -99,31 +98,29 @@ export default function App() {
 
   // ================= PRODUTOS =================
   const adicionarProduto = () => {
-    if (!nome || !precoCompra || !precoVenda || !estoque) return;
+  if (!nome || !preco || !estoque) return;
 
-    setProdutos(prev => [
-      ...prev,
-      {
-        id: Date.now(),
-        nome,
-        preco: Number(precoCompra),
-        precoVenda: Number(precoVenda),
-        estoque: Number(estoque),
-        imagem
-      }
-    ]);
+  setProdutos(prev => [
+    ...prev,
+    {
+      id: Date.now(),
+      nome,
+      preco: Number(nome), // compra (ajuste depois se quiser separar melhor)
+      precoVenda: Number(preco),
+      estoque: Number(estoque)
+    }
+  ]);
 
-    setNome("");
-    setPrecoCompra("");
-    setPrecoVenda("");
-    setEstoque("");
-    setImagem("");
-  };
+  setNome("");
+  setPreco("");
+  setEstoque("");
+};
 
   const produto = produtos.find(p =>
     p.nome?.toLowerCase().includes(busca.toLowerCase())
   );
 
+  // ================= CARRINHO =================
   const addCarrinho = () => {
     if (!produto || produto.estoque <= 0) return;
 
@@ -154,19 +151,30 @@ export default function App() {
     setCarrinho(prev =>
       prev
         .map(p =>
-          p.id === id ? { ...p, qtd: p.qtd - 1 } : p
+          p.id === id
+            ? { ...p, qtd: p.qtd - 1 }
+            : p
         )
         .filter(p => p.qtd > 0)
+    );
+
+    setProdutos(prev =>
+      prev.map(p =>
+        p.id === id
+          ? { ...p, estoque: p.estoque + 1 }
+          : p
+      )
     );
   };
 
   const limparCarrinho = () => setCarrinho([]);
 
   const total = carrinho.reduce(
-    (a, p) => a + p.precoVenda * (p.qtd || 1),
+    (a, p) => a + p.preco * (p.qtd || 1),
     0
   );
 
+  // ================= FINALIZAR (VENDA + PENDENTE) =================
   const finalizar = () => {
     if (!carrinho.length) return;
 
@@ -175,12 +183,13 @@ export default function App() {
     const venda = {
       id: Date.now(),
       cliente: cliente || "Sem nome",
-      pagamento,
+      pagamento: modoVenda === "normal" ? pagamento : null,
       modo: modoVenda,
       itens: carrinho,
       total,
       data: agora.toISOString().split("T")[0],
-      hora: agora.toTimeString().slice(0, 5)
+      hora: agora.toTimeString().slice(0, 5),
+      timestamp: Date.now()
     };
 
     if (modoVenda === "pendente") {
@@ -190,9 +199,16 @@ export default function App() {
     }
 
     setCarrinho([]);
+    setCliente("");
+    setPagamento("dinheiro");
+    setModoVenda("normal");
   };
 
-  // ================= LOGIN SCREEN =================
+  const hoje = new Date().toISOString().split("T")[0];
+  const vendasHoje = vendas.filter(v => v.data === hoje);
+  const totalHoje = vendasHoje.reduce((soma, v) => soma + v.total, 0);
+
+  // ================= LOGIN =================
   if (!token) {
     return (
       <div style={{ padding: 20 }}>
@@ -203,76 +219,53 @@ export default function App() {
 
         <button onClick={login}>Entrar</button>
         <button onClick={register}>Criar conta</button>
-        <button onClick={loginGoogle}>Google</button>
+
+        <hr />
+
+        <button onClick={loginGoogle}>🔐 Entrar com Google</button>
       </div>
     );
   }
 
+  // ================= UI =================
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", fontFamily: "Arial" }}>
 
-      {/* MENU */}
-      <div style={{ width: 220, background: "#111", color: "#fff", padding: 20 }}>
-        <h2>MAGNUS</h2>
+      <div style={{ width: 220, minHeight: "100vh", background: "#0f0f1a", color: "#fff", padding: 20 }}>
+        <h2 style={{ color: "#a855f7" }}>MAGNUS</h2>
 
         <button onClick={() => setTab("vendas")}>Vendas</button>
         <button onClick={() => setTab("produtos")}>Produtos</button>
         <button onClick={() => setTab("pendentes")}>Pendentes</button>
+        <button onClick={() => setTab("stats")}>Estatísticas</button>
+        <button onClick={() => setTab("extrato")}>Extrato</button>
+
+        <hr />
 
         <button onClick={() => {
           signOut(auth);
+          localStorage.removeItem("token");
           setToken("");
         }}>
           Sair
         </button>
       </div>
 
-      {/* CONTEÚDO */}
       <div style={{ flex: 1, padding: 20 }}>
 
-        {/* PRODUTOS */}
-        {tab === "produtos" && (
-          <div>
-            <h2>Produtos</h2>
-
-            <input placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} />
-            <input placeholder="Compra" value={precoCompra} onChange={e => setPrecoCompra(e.target.value)} />
-            <input placeholder="Venda" value={precoVenda} onChange={e => setPrecoVenda(e.target.value)} />
-            <input placeholder="Estoque" value={estoque} onChange={e => setEstoque(e.target.value)} />
-
-            <input type="file" onChange={e => {
-              const file = e.target.files[0];
-              const reader = new FileReader();
-              reader.onload = () => setImagem(reader.result);
-              reader.readAsDataURL(file);
-            }} />
-
-            <button onClick={adicionarProduto}>Adicionar</button>
-
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-              {produtos.map(p => (
-                <div key={p.id} style={{ border: "1px solid #333", padding: 10, width: 200 }}>
-                  {p.imagem && <img src={p.imagem} width={80} />}
-                  <h4>{p.nome}</h4>
-                  <p>Compra: {p.preco}</p>
-                  <p>Venda: {p.precoVenda}</p>
-                  <p>Estoque: {p.estoque}</p>
-                </div>
-              ))}
-            </div>
-
-          </div>
-        )}
+        <h1>💰 MAGNUS</h1>
+        {user && <p>👤 {user.displayName}</p>}
 
         {tab === "vendas" && (
           <div>
-            <h2>Vendas</h2>
 
-            <input placeholder="Cliente" value={cliente} onChange={e => setCliente(e.target.value)} />
+            <h2>💰 Vendas</h2>
+
+            <input placeholder="Cliente (opcional)" value={cliente} onChange={e => setCliente(e.target.value)} />
 
             <select value={modoVenda} onChange={e => setModoVenda(e.target.value)}>
-              <option value="normal">Normal</option>
-              <option value="pendente">Pendente</option>
+              <option value="normal">Venda normal</option>
+              <option value="pendente">Venda pendente</option>
             </select>
 
             {modoVenda === "normal" && (
@@ -283,12 +276,133 @@ export default function App() {
               </select>
             )}
 
+            <input placeholder="Buscar produto" value={busca} onChange={e => setBusca(e.target.value)} />
+
+            {produto && (
+              <div>
+                {produto.nome} - R$ {produto.preco}
+                <button onClick={addCarrinho}>Adicionar</button>
+              </div>
+            )}
+
+            <h3>Carrinho</h3>
+
+            {carrinho.map((item, i) => (
+              <div key={i}>
+                {item.nome} x{item.qtd || 1}
+                <button onClick={() => removerItem(item.id)}>➖</button>
+              </div>
+            ))}
+
+            <button onClick={limparCarrinho}>Limpar</button>
+
+            <h3>Total: R$ {total.toFixed(2)}</h3>
+
             <button onClick={finalizar}>Finalizar</button>
+
+            <hr />
+
+            <h3>Total do dia: R$ {totalHoje.toFixed(2)}</h3>
+
+            {vendasHoje.map(v => (
+              <div key={v.id}>
+                🕒 {v.hora} - R$ {v.total}
+              </div>
+            ))}
 
           </div>
         )}
 
+        {tab === "produtos" && (
+  <div>
+    <h2>📦 Produtos</h2>
+
+    <input
+      placeholder="Nome"
+      value={nome}
+      onChange={e => setNome(e.target.value)}
+    />
+
+    <input
+      placeholder="Preço de compra"
+      value={preco}
+      onChange={e => setPreco(e.target.value)}
+    />
+
+    <input
+      placeholder="Preço de venda"
+      onChange={e => setEstoque(e.target.value)}
+    />
+
+    <input
+      placeholder="Estoque"
+      value={estoque}
+      onChange={e => setEstoque(e.target.value)}
+    />
+
+    <button onClick={adicionarProduto}>
+      ➕ Adicionar produto
+    </button>
+
+    <hr />
+
+    {/* LISTA PROFISSIONAL */}
+    {produtos.map(p => {
+      const lucroUnit = (Number(p.precoVenda || 0) - Number(p.preco || 0));
+      const lucroTotal = lucroUnit * Number(p.estoque || 0);
+
+      return (
+        <div
+          key={p.id}
+          style={{
+            padding: 10,
+            border: "1px solid #333",
+            marginBottom: 10,
+            borderRadius: 8
+          }}
+        >
+          <h3>{p.nome}</h3>
+
+          <p>💰 Compra: R$ {p.preco}</p>
+          <p>💸 Venda: R$ {p.precoVenda || 0}</p>
+          <p>📦 Estoque: {p.estoque}</p>
+
+          <p>📊 Lucro unit: R$ {lucroUnit.toFixed(2)}</p>
+          <p>📈 Lucro total: R$ {lucroTotal.toFixed(2)}</p>
+        </div>
+      );
+    })}
+
+    <hr />
+
+    {/* RESUMO GERAL */}
+    <h3>📊 Resumo do estoque</h3>
+
+    <p>
+      💰 Valor total de compra: R${" "}
+      {produtos.reduce((s, p) => s + p.preco * p.estoque, 0).toFixed(2)}
+    </p>
+
+    <p>
+      💸 Valor total de venda: R${" "}
+      {produtos.reduce((s, p) => s + (p.precoVenda || 0) * p.estoque, 0).toFixed(2)}
+    </p>
+
+    <p>
+      📈 Lucro total geral: R${" "}
+      {produtos.reduce(
+        (s, p) =>
+          s +
+          ((p.precoVenda || 0) - p.preco) * p.estoque,
+        0
+      ).toFixed(2)}
+    </p>
+  </div>
+)}
+
         {tab === "pendentes" && <h2>Pendentes</h2>}
+        {tab === "stats" && <h2>Estatísticas</h2>}
+        {tab === "extrato" && <h2>Extrato</h2>}
 
       </div>
     </div>
