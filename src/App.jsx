@@ -25,6 +25,10 @@ export default function App() {
 
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
+const total = carrinho.reduce(
+  (a, p) => a + (p.precoVenda || 0) * (p.qtd || 1),
+  0
+);
 
 
   // 🔥 NIVEL 3
