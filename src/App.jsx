@@ -25,11 +25,6 @@ export default function App() {
 
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
-const total = carrinho.reduce(
-  (a, p) => a + (p.precoVenda || 0) * (p.qtd || 1),
-  0
-);
-
 
   // 🔥 NIVEL 3
   const [cliente, setCliente] = useState("");
@@ -42,6 +37,11 @@ const total = carrinho.reduce(
 
 
   // ================= LOGIN =================
+  const toNumber = (value) => {
+  if (!value) return 0;
+  return parseFloat(value.replace(",", "."));
+};
+
   const login = async () => {
     const res = await fetch(API + "/login", {
       method: "POST",
