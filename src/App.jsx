@@ -71,12 +71,7 @@ export default function App() {
     setToken(idToken);
     localStorage.setItem("token", idToken);
   };
-  
-  const total = carrinho.reduce(
-  (a, p) => a + (p.precoVenda || 0) * (p.qtd || 1),
-  0
-);
-
+ 
   // ================= LOAD =================
   useEffect(() => {
     if (!token) return;
@@ -171,6 +166,11 @@ const produto = produtos.find(p =>
       )
     );
   };
+   
+  const total = carrinho.reduce(
+  (a, p) => a + (p.precoVenda || 0) * (p.qtd || 1),
+  0
+);
 
   const removerItem = (id) => {
     setCarrinho(prev =>
