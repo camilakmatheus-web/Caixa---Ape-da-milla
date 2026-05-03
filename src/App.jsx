@@ -36,6 +36,7 @@ export default function App() {
   const [subTab, setSubTab] = useState("cadastro");
   const [produtoSelecionado, setProdutoSelecionado] = useState(null); 
 
+
   // ================= LOGIN =================
   const login = async () => {
     const res = await fetch(API + "/login", {
@@ -70,6 +71,11 @@ export default function App() {
     setToken(idToken);
     localStorage.setItem("token", idToken);
   };
+  
+  const total = carrinho.reduce(
+  (a, p) => a + (p.precoVenda || 0) * (p.qtd || 1),
+  0
+);
 
   // ================= LOAD =================
   useEffect(() => {
@@ -106,20 +112,29 @@ export default function App() {
 
   // ================= PRODUTOS =================
 const adicionarProduto = () => {
-  if (!nome || !preco || !precoVenda || !estoque) return;
+  const precoNum = toNumber(preco);
+  const precoVendaNum = toNumber(precoVenda);
+  const estoqueNum = parseInt(estoque);
+
+  // 🔥 VALIDAÇÃO
+  if (!nome || precoNum <= 0 || precoVendaNum <= 0 || isNaN(estoqueNum)) {
+    alert("Preencha os valores corretamente");
+    return;
+  }
 
   setProdutos(prev => [
     ...prev,
     {
       id: Date.now(),
       nome,
-      preco: Number(preco), // ✅ PREÇO DE COMPRA CORRIGIDO
-      precoVenda: Number(precoVenda), // ✅ VENDA SEPARADO
-      estoque: Number(estoque),
-      imagem // ✅ IMAGEM DO PRODUTO
+      preco: precoNum,
+      precoVenda: precoVendaNum,
+      estoque: estoqueNum,
+      imagem
     }
   ]);
 
+  // limpar campos
   setNome("");
   setPreco("");
   setPrecoVenda("");
@@ -180,7 +195,7 @@ const produto = produtos.find(p =>
   const limparCarrinho = () => setCarrinho([]);
 
   const total = carrinho.reduce(
-    (a, p) => a + p.preco * (p.qtd || 1),
+    (a, p) => a + (p.precoVenda || 0) * (p.qtd || 1),
     0
   );
 
