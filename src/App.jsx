@@ -15,6 +15,9 @@ export default function App() {
   const [produtos, setProdutos] = useState([]);
   const [vendas, setVendas] = useState([]);
   const [pendentes, setPendentes] = useState([]);
+  const [clientes, setClientes] = useState([]);
+  const [novoCliente, setNovoCliente] = useState("");
+  const [clienteSelecionado, setClienteSelecionado] = useState(null);
 
   const [nome, setNome] = useState("");
   const [preco, setPreco] = useState("");
@@ -185,12 +188,18 @@ const produto = produtos.find(p =>
 const finalizar = () => {
   if (!carrinho.length) return;
 
+  // 🚨 OBRIGAR CLIENTE EM VENDA PENDENTE
+  if (modoVenda === "pendente" && !cliente) {
+    alert("Selecione um cliente");
+    return;
+  }
+
   const agora = new Date();
   const timestamp = Date.now();
 
   const venda = {
     id: timestamp,
-    cliente: cliente || "Sem nome",
+    cliente: cliente, // ✅ agora é obrigatório
     pagamento: modoVenda === "normal" ? pagamento : null,
     modo: modoVenda,
     itens: carrinho,
@@ -200,6 +209,7 @@ const finalizar = () => {
     timestamp
   };
 
+  // 🔥 SEPARAÇÃO CORRETA
   if (modoVenda === "pendente") {
     setPendentes(prev => [...prev, venda]);
   } else {
@@ -212,26 +222,22 @@ const finalizar = () => {
   setPagamento("dinheiro");
   setModoVenda("normal");
 };
-
-// ================= MARCAR COMO PAGO =================
-const marcarComoPago = (venda) => {
-  // remove dos pendentes
-  setPendentes(prev => prev.filter(p => p.id !== venda.id));
-
-  // adiciona como venda normal
-  setVendas(prev => [
-    ...prev,
-    {
-      ...venda,
-      modo: "normal",
-      pagamento: "pendente_pago"
-    }
-  ]);
-};
-
 // ================= REMOVER PENDENTE =================
 const removerPendente = (id) => {
   setPendentes(prev => prev.filter(p => p.id !== id));
+};
+const adicionarCliente = () => {
+  if (!novoCliente) return;
+
+  setClientes(prev => [
+    ...prev,
+    {
+      id: Date.now(),
+      nome: novoCliente
+    }
+  ]);
+
+  setNovoCliente("");
 };
 // 📊 RESUMO DO DIA
 const hoje = new Date().toISOString().split("T")[0];
@@ -503,14 +509,30 @@ const totalHoje = vendasHoje.reduce(
 )}  // 👈 🔥 ISSO AQUI FALTAVA
 {tab === "pendentes" && (
   <div>
-    <h2>📌 Vendas Pendentes</h2>
+    <h2>📌 Pendentes</h2>
 
-    {pendentes.length === 0 ? (
-      <p>Nenhuma venda pendente</p>
-    ) : (
-      pendentes.map(p => (
+    {/* ADICIONAR CLIENTE */}
+    <div style={{ marginBottom: 20 }}>
+      <input
+        placeholder="Nome do cliente"
+        value={novoCliente}
+        onChange={e => setNovoCliente(e.target.value)}
+      />
+      <button onClick={adicionarCliente}>➕ Adicionar</button>
+    </div>
+
+    {/* LISTA DE CLIENTES */}
+    {clientes.map(c => {
+      const vendasCliente = pendentes.filter(p => p.cliente === c.nome);
+
+      const totalCliente = vendasCliente.reduce(
+        (soma, v) => soma + v.total,
+        0
+      );
+
+      return (
         <div
-          key={p.id}
+          key={c.id}
           style={{
             border: "1px solid #333",
             padding: 10,
@@ -518,20 +540,49 @@ const totalHoje = vendasHoje.reduce(
             borderRadius: 8
           }}
         >
-          <p>👤 Cliente: {p.cliente}</p>
-          <p>💰 Valor: R$ {p.total.toFixed(2)}</p>
-          <p>📅 {p.data} - {p.hora}</p>
+          <h3 onClick={() => setClienteSelecionado(c.nome)}>
+            👤 {c.nome}
+          </h3>
 
-          <button onClick={() => marcarComoPago(p)}>
-            ✅ Marcar como pago
+          <p>💰 Total: R$ {totalCliente.toFixed(2)}</p>
+
+          <button
+            onClick={() =>
+              vendasCliente.forEach(v => marcarComoPago(v))
+            }
+          >
+            ✅ Finalizar tudo
           </button>
 
-          <button onClick={() => removerPendente(p.id)}>
-            ❌ Excluir
+          <button
+            onClick={() =>
+              setClientes(prev => prev.filter(x => x.id !== c.id))
+            }
+          >
+            ❌ Excluir cliente
           </button>
+
+          {/* DETALHES */}
+          {clienteSelecionado === c.nome && (
+            <div style={{ marginTop: 10 }}>
+              {vendasCliente.map(v => (
+                <div key={v.id}>
+                  🧾 R$ {v.total.toFixed(2)} - {v.hora}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ))
-    )}
+      );
+    })}
+
+    {/* TOTAL GERAL */}
+    <h3>
+      💵 Total geral: R${" "}
+      {pendentes
+        .reduce((soma, v) => soma + v.total, 0)
+        .toFixed(2)}
+    </h3>
   </div>
 )}
 {tab === "stats" && <h2>Estatísticas</h2>}
