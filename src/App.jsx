@@ -34,6 +34,7 @@ export default function App() {
   const [imagem, setImagem] = useState("");
   const [subTab, setSubTab] = useState("cadastro");
   const [produtoSelecionado, setProdutoSelecionado] = useState(null); 
+  const [periodo, setPeriodo] = useState("7d");
 
 
   // ================= LOGIN =================
