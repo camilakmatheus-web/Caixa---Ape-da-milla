@@ -181,13 +181,15 @@ const produto = produtos.find(p =>
   );
 
   // ================= FINALIZAR (VENDA + PENDENTE) =================
-  const finalizar = () => {
+ // ================= FINALIZAR (VENDA + PENDENTE) =================
+const finalizar = () => {
   if (!carrinho.length) return;
 
   const agora = new Date();
+  const timestamp = Date.now();
 
   const venda = {
-    id: Date.now(),
+    id: timestamp,
     cliente: cliente || "Sem nome",
     pagamento: modoVenda === "normal" ? pagamento : null,
     modo: modoVenda,
@@ -195,7 +197,7 @@ const produto = produtos.find(p =>
     total,
     data: agora.toISOString().split("T")[0],
     hora: agora.toTimeString().slice(0, 5),
-    timestamp: Date.now()
+    timestamp
   };
 
   if (modoVenda === "pendente") {
@@ -204,16 +206,19 @@ const produto = produtos.find(p =>
     setVendas(prev => [...prev, venda]);
   }
 
+  // 🔄 RESET
   setCarrinho([]);
   setCliente("");
   setPagamento("dinheiro");
   setModoVenda("normal");
 };
 
-// ✅ NOVO — MARCAR COMO PAGO
+// ================= MARCAR COMO PAGO =================
 const marcarComoPago = (venda) => {
+  // remove dos pendentes
   setPendentes(prev => prev.filter(p => p.id !== venda.id));
 
+  // adiciona como venda normal
   setVendas(prev => [
     ...prev,
     {
@@ -224,11 +229,10 @@ const marcarComoPago = (venda) => {
   ]);
 };
 
-// ✅ NOVO — REMOVER PENDENTE
+// ================= REMOVER PENDENTE =================
 const removerPendente = (id) => {
   setPendentes(prev => prev.filter(p => p.id !== id));
 };
-
 // 📊 RESUMO DO DIA
 const hoje = new Date().toISOString().split("T")[0];
 
@@ -497,7 +501,39 @@ const totalHoje = vendasHoje.reduce(
 
 </div>
 )}  // 👈 🔥 ISSO AQUI FALTAVA
+{tab === "pendentes" && (
+  <div>
+    <h2>📌 Vendas Pendentes</h2>
 
+    {pendentes.length === 0 ? (
+      <p>Nenhuma venda pendente</p>
+    ) : (
+      pendentes.map(p => (
+        <div
+          key={p.id}
+          style={{
+            border: "1px solid #333",
+            padding: 10,
+            marginBottom: 10,
+            borderRadius: 8
+          }}
+        >
+          <p>👤 Cliente: {p.cliente}</p>
+          <p>💰 Valor: R$ {p.total.toFixed(2)}</p>
+          <p>📅 {p.data} - {p.hora}</p>
+
+          <button onClick={() => marcarComoPago(p)}>
+            ✅ Marcar como pago
+          </button>
+
+          <button onClick={() => removerPendente(p.id)}>
+            ❌ Excluir
+          </button>
+        </div>
+      ))
+    )}
+  </div>
+)}
 {tab === "stats" && <h2>Estatísticas</h2>}
 {tab === "extrato" && <h2>Extrato</h2>}
 
