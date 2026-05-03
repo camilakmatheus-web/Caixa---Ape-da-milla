@@ -98,17 +98,23 @@ export default function App() {
 
   // ================= PRODUTOS =================
   const adicionarProduto = () => {
-    if (!nome || !preco || !estoque) return;
+  if (!nome || !preco || !estoque) return;
 
-    setProdutos(prev => [
-      ...prev,
-      { id: Date.now(), nome, preco: Number(preco), estoque: Number(estoque) }
-    ]);
+  setProdutos(prev => [
+    ...prev,
+    {
+      id: Date.now(),
+      nome,
+      preco: Number(nome), // compra (ajuste depois se quiser separar melhor)
+      precoVenda: Number(preco),
+      estoque: Number(estoque)
+    }
+  ]);
 
-    setNome("");
-    setPreco("");
-    setEstoque("");
-  };
+  setNome("");
+  setPreco("");
+  setEstoque("");
+};
 
   const produto = produtos.find(p =>
     p.nome?.toLowerCase().includes(busca.toLowerCase())
@@ -308,22 +314,91 @@ export default function App() {
         )}
 
         {tab === "produtos" && (
-          <div>
-            <h2>Produtos</h2>
+  <div>
+    <h2>📦 Produtos</h2>
 
-            <input placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} />
-            <input placeholder="Preço" value={preco} onChange={e => setPreco(e.target.value)} />
-            <input placeholder="Estoque" value={estoque} onChange={e => setEstoque(e.target.value)} />
+    <input
+      placeholder="Nome"
+      value={nome}
+      onChange={e => setNome(e.target.value)}
+    />
 
-            <button onClick={adicionarProduto}>Adicionar</button>
+    <input
+      placeholder="Preço de compra"
+      value={preco}
+      onChange={e => setPreco(e.target.value)}
+    />
 
-            {produtos.map(p => (
-              <div key={p.id}>
-                {p.nome} - R$ {p.preco} ({p.estoque})
-              </div>
-            ))}
-          </div>
-        )}
+    <input
+      placeholder="Preço de venda"
+      onChange={e => setEstoque(e.target.value)}
+    />
+
+    <input
+      placeholder="Estoque"
+      value={estoque}
+      onChange={e => setEstoque(e.target.value)}
+    />
+
+    <button onClick={adicionarProduto}>
+      ➕ Adicionar produto
+    </button>
+
+    <hr />
+
+    {/* LISTA PROFISSIONAL */}
+    {produtos.map(p => {
+      const lucroUnit = (Number(p.precoVenda || 0) - Number(p.preco || 0));
+      const lucroTotal = lucroUnit * Number(p.estoque || 0);
+
+      return (
+        <div
+          key={p.id}
+          style={{
+            padding: 10,
+            border: "1px solid #333",
+            marginBottom: 10,
+            borderRadius: 8
+          }}
+        >
+          <h3>{p.nome}</h3>
+
+          <p>💰 Compra: R$ {p.preco}</p>
+          <p>💸 Venda: R$ {p.precoVenda || 0}</p>
+          <p>📦 Estoque: {p.estoque}</p>
+
+          <p>📊 Lucro unit: R$ {lucroUnit.toFixed(2)}</p>
+          <p>📈 Lucro total: R$ {lucroTotal.toFixed(2)}</p>
+        </div>
+      );
+    })}
+
+    <hr />
+
+    {/* RESUMO GERAL */}
+    <h3>📊 Resumo do estoque</h3>
+
+    <p>
+      💰 Valor total de compra: R${" "}
+      {produtos.reduce((s, p) => s + p.preco * p.estoque, 0).toFixed(2)}
+    </p>
+
+    <p>
+      💸 Valor total de venda: R${" "}
+      {produtos.reduce((s, p) => s + (p.precoVenda || 0) * p.estoque, 0).toFixed(2)}
+    </p>
+
+    <p>
+      📈 Lucro total geral: R${" "}
+      {produtos.reduce(
+        (s, p) =>
+          s +
+          ((p.precoVenda || 0) - p.preco) * p.estoque,
+        0
+      ).toFixed(2)}
+    </p>
+  </div>
+)}
 
         {tab === "pendentes" && <h2>Pendentes</h2>}
         {tab === "stats" && <h2>Estatísticas</h2>}
