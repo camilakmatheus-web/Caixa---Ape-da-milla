@@ -25,6 +25,11 @@ export default function App() {
 
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
+  const total = carrinho.reduce(
+  (soma, item) =>
+    soma + Number(item.preco || 0) * Number(item.qtd || 1),
+  0
+);
 
   // 🔥 NIVEL 3
   const [cliente, setCliente] = useState("");
