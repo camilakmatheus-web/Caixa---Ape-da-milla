@@ -498,44 +498,10 @@ const totalHoje = vendasHoje.reduce(
 </div>
 )}  // 👈 🔥 ISSO AQUI FALTAVA
 
-{tab === "pendentes" && (
-  <div>
-    <h2>📌 Vendas Pendentes</h2>
-
-    {pendentes.length === 0 ? (
-      <p>Nenhuma venda pendente</p>
-    ) : (
-      pendentes.map(p => (
-        <div
-          key={p.id}
-          style={{
-            border: "1px solid #333",
-            padding: 10,
-            marginBottom: 10,
-            borderRadius: 8
-          }}
-        >
-          <p>👤 Cliente: {p.cliente}</p>
-          <p>💰 Valor: R$ {p.total.toFixed(2)}</p>
-          <p>📅 {p.data} - {p.hora}</p>
-
-          <button onClick={() => marcarComoPago(p)}>
-            ✅ Marcar como pago
-          </button>
-
-          <button onClick={() => removerPendente(p.id)}>
-            ❌ Excluir
-          </button>
-        </div>
-      ))
-    )}
-  </div>
-)}
-
 {tab === "stats" && <h2>Estatísticas</h2>}
 {tab === "extrato" && <h2>Extrato</h2>}
 
-    </div> {/* FECHA CONTEÚDO DIREITA */}
-  </div>   {/* FECHA CONTAINER GERAL */}
-;        {/* FECHA RETURN */}
-         {/* FECHA FUNÇÃO APP */} }
+    </div>
+  </div>
+);
+}
