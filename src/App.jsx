@@ -30,7 +30,7 @@ export default function App() {
   const [precoVenda, setPrecoVenda] = useState("");
   const [imagem, setImagem] = useState("");
   const [subTab, setSubTab] = useState("cadastro");
-  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null); }
 
   // ================= LOGIN =================
   const login = async () => {
@@ -387,74 +387,97 @@ const produto = produtos.find(p =>
         </button>
       </div>
     )}
-
     {/* ================= LISTA ================= */}
-    {subTab === "lista" && (
-      <div style={{ display: "flex", gap: 20 }}>
+ {subTab === "lista" && (
+  <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+    <div style={{ display: "flex", gap: 20 }}>
 
-        {/* LISTA LATERAL */}
-        <div style={{ width: 200 }}>
-          {produtos.map(p => (
-            <div
-              key={p.id}
-              style={{
-                padding: 10,
-                border: "1px solid #333",
-                marginBottom: 10,
-                cursor: "pointer"
-              }}
-              onClick={() => setProdutoSelecionado(p)}
-            >
-              {p.nome}
-            </div>
-          ))}
-        </div>
-
-        {/* DETALHES */}
-        <div style={{ flex: 1 }}>
-          {produtoSelecionado ? (
-            <div>
-              <h3>{produtoSelecionado.nome}</h3>
-
-              {produtoSelecionado.imagem && (
-                <img
-                  src={produtoSelecionado.imagem}
-                  style={{ width: 200, borderRadius: 10 }}
-                />
-              )}
-
-              <p>💰 Compra: R$ {produtoSelecionado.preco}</p>
-              <p>💸 Venda: R$ {produtoSelecionado.precoVenda}</p>
-              <p>📦 Estoque: {produtoSelecionado.estoque}</p>
-
-              <p>
-                📊 Lucro unit: R${" "}
-                {(produtoSelecionado.precoVenda - produtoSelecionado.preco).toFixed(2)}
-              </p>
-
-              <p>
-                📈 Lucro total: R${" "}
-                {(
-                  (produtoSelecionado.precoVenda - produtoSelecionado.preco) *
-                  produtoSelecionado.estoque
-                ).toFixed(2)}
-              </p>
-            </div>
-          ) : (
-            <p>Selecione um produto</p>
-          )}
-        </div>
+      <div style={{ width: 200 }}>
+        {produtos.map(p => (
+          <div
+            key={p.id}
+            style={{
+              padding: 10,
+              border: "1px solid #333",
+              marginBottom: 10,
+              cursor: "pointer"
+            }}
+            onClick={() => setProdutoSelecionado(p)}
+          >
+            {p.nome}
+          </div>
+        ))}
       </div>
-    )}
+
+      <div style={{ flex: 1 }}>
+        {produtoSelecionado ? (
+          <div>
+            <h3>{produtoSelecionado.nome}</h3>
+
+            {produtoSelecionado.imagem && (
+              <img
+                src={produtoSelecionado.imagem}
+                style={{ width: 200, borderRadius: 10 }}
+              />
+            )}
+
+            <p>💰 Compra: R$ {produtoSelecionado.preco}</p>
+            <p>💸 Venda: R$ {produtoSelecionado.precoVenda}</p>
+            <p>📦 Estoque: {produtoSelecionado.estoque}</p>
+
+            <p>
+              📊 Lucro unit: R${" "}
+              {(produtoSelecionado.precoVenda - produtoSelecionado.preco).toFixed(2)}
+            </p>
+
+            <p>
+              📈 Lucro total: R${" "}
+              {(
+                (produtoSelecionado.precoVenda - produtoSelecionado.preco) *
+                produtoSelecionado.estoque
+              ).toFixed(2)}
+            </p>
+          </div>
+        ) : (
+          <p>Selecione um produto</p>
+        )}
+      </div>
+
+    </div>
+
+    <div style={{ borderTop: "2px solid #333", paddingTop: 20 }}>
+      <h3>📊 Estatísticas gerais</h3>
+
+      <p>
+        💰 Total investido: R${" "}
+        {produtos.reduce((s, p) => s + p.preco * p.estoque, 0).toFixed(2)}
+      </p>
+
+      <p>
+        💸 Valor potencial de venda: R${" "}
+        {produtos.reduce((s, p) => s + (p.precoVenda || 0) * p.estoque, 0).toFixed(2)}
+      </p>
+
+      <p>
+        📈 Lucro total estimado: R${" "}
+        {produtos.reduce(
+          (s, p) =>
+            s + ((p.precoVenda || 0) - p.preco) * p.estoque,
+          0
+        ).toFixed(2)}
+      </p>
+    </div>
+
   </div>
 )}
 
+</div>
+)}  // 👈 🔥 ISSO AQUI FALTAVA
 
-        {tab === "pendentes" && <h2>Pendentes</h2>}
-        {tab === "stats" && <h2>Estatísticas</h2>}
-        {tab === "extrato" && <h2>Extrato</h2>}
+{tab === "pendentes" && <h2>Pendentes</h2>}
+{tab === "stats" && <h2>Estatísticas</h2>}
+{tab === "extrato" && <h2>Extrato</h2>}
 
-      </div>
-    </div>
-  );
-}
+</div>
+</div>
+);
