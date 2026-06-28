@@ -8146,6 +8146,31 @@ return (
         setConsumos((prev) => [data.consumo, ...prev]);
       }
 
+setProdutos(prev =>
+  prev.map(produto => {
+
+    const item = carrinhoConsumo.find(
+      i => i.id === produto.id
+    );
+
+    if (!item) return produto;
+
+    // estoque ilimitado não altera
+    if (produto.estoqueIlimitado) {
+      return produto;
+    }
+
+    return {
+      ...produto,
+      estoque: Math.max(
+        0,
+        Number(produto.estoque || 0) - Number(item.qtd || 1)
+      )
+    };
+
+  })
+);
+
       setCarrinhoConsumo([]);
       setBuscaConsumo("");
       setOpenConsumo(false);
