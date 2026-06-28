@@ -1215,7 +1215,7 @@ useEffect(() => {
   pendentes,
   clientes,
 
-consumos,  
+ 
   anotacoes,
   categoriasProdutos,
 categoriasDespesas,
@@ -1307,7 +1307,7 @@ useEffect(() => {
 useEffect(() => {
   if (!token) return;
 
-  fetch(API + "/consumos", {
+  fetch(API + "/consumo", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
