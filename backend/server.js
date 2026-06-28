@@ -436,55 +436,80 @@ app.put("/cancelar-venda/:id", async (req, res) => {
 
 app.post("/consumo", async (req, res) => {
   try {
+
     const { itens, descricao } = req.body;
+
+    // Enquanto não usa auth, pega o primeiro caixa
+    // Depois é só trocar por:
+    // const caixa = await Caixa.findOne({ userId: req.userId });
 
     const caixa = await Caixa.findOne();
 
     if (!caixa) {
-      return res.status(404).json({ error: "Caixa não encontrado" });
+      return res.status(404).json({
+        error: "Caixa não encontrado"
+      });
     }
 
-    // 🔥 BAIXA ESTOQUE (VERSÃO ROBUSTA)
+    // Garante os arrays
+    if (!Array.isArray(caixa.produtos)) {
+      caixa.produtos = [];
+    }
+
+    if (!Array.isArray(caixa.consumos)) {
+      caixa.consumos = [];
+    }
+
+    // Baixa estoque
     itens.forEach((item) => {
+
       const produto = caixa.produtos.find((p) =>
         String(p.id) === String(item.id) ||
         String(p._id) === String(item.id)
       );
 
-      if (produto) {
-        const qtd = item.qtd || 1;
+      if (!produto) return;
 
-        produto.estoque = Math.max(
-          0,
-          (produto.estoque ?? 0) - qtd
-        );
-      }
+      // Não baixa estoque ilimitado
+      if (produto.estoqueIlimitado) return;
+
+      const qtd = Number(item.qtd || 1);
+
+      produto.estoque = Math.max(
+        0,
+        Number(produto.estoque || 0) - qtd
+      );
+
     });
 
-    // 🔥 garante array
-    if (!Array.isArray(caixa.consumos)) {
-      caixa.consumos = [];
-    }
-
+    // Cria consumo
     const novoConsumo = {
       id: Date.now(),
-      itens,
       descricao: descricao || "Consumo interno",
+      itens,
       data: new Date()
     };
 
+    // Adiciona ao histórico
     caixa.consumos.unshift(novoConsumo);
 
+    // Salva alterações (estoque + histórico)
     await caixa.save();
 
-    res.json({
+    return res.json({
       success: true,
-      consumo: novoConsumo
+      consumo: novoConsumo,
+      produtos: caixa.produtos
     });
 
   } catch (err) {
+
     console.log("ERRO CONSUMO:", err);
-    res.status(500).json({ error: "Erro no consumo" });
+
+    return res.status(500).json({
+      error: "Erro ao registrar consumo"
+    });
+
   }
 });
 
@@ -575,16 +600,31 @@ app.post("/despesas", async (req, res) => {
 });
 
 app.get("/consumos", async (req, res) => {
+
   try {
+
     const caixa = await Caixa.findOne();
 
     if (!caixa) {
       return res.json([]);
     }
 
-    return res.json(caixa.consumos || []);
+    // Garante que consumos seja um array
+    if (!Array.isArray(caixa.consumos)) {
+      caixa.consumos = [];
+      await caixa.save();
+    }
+
+    return res.json(caixa.consumos);
 
   } catch (err) {
-    res.status(500).json({ error: "Erro ao buscar consumos" });
+
+    console.log("ERRO GET CONSUMOS:", err);
+
+    return res.status(500).json({
+      error: "Erro ao buscar consumos"
+    });
+
   }
+
 });

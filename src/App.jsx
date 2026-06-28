@@ -1303,6 +1303,22 @@ useEffect(() => {
   return () => clearTimeout(timeout);
 }, [despesas, token, firstLoadDone, loaded]);
 
+// SAVE CONSUMO SEPARADO //
+useEffect(() => {
+  if (!token) return;
+
+  fetch(API + "/consumos", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      consumos
+    })
+  });
+
+}, [consumos, token]);
+
 useEffect(() => {
 
   const historicoSalvo =
