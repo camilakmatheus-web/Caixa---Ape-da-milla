@@ -600,33 +600,5 @@ app.post("/despesas", async (req, res) => {
 });
 
 
-app.get("/consumos", async (req, res) => {
 
-  try {
-
-    const caixa = await Caixa.findOne();
-
-    if (!caixa) {
-      return res.json([]);
-    }
-
-    // Garante que consumos seja um array
-    if (!Array.isArray(caixa.consumos)) {
-      caixa.consumos = [];
-      await caixa.save();
-    }
-
-    return res.json(caixa.consumos);
-
-  } catch (err) {
-
-    console.log("ERRO GET CONSUMOS:", err);
-
-    return res.status(500).json({
-      error: "Erro ao buscar consumos"
-    });
-
-  }
-
-});
 
