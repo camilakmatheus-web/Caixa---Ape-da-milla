@@ -1215,7 +1215,7 @@ useEffect(() => {
   pendentes,
   clientes,
 
-  
+consumos,  
   anotacoes,
   categoriasProdutos,
 categoriasDespesas,
