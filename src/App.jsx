@@ -1219,8 +1219,7 @@ useEffect(() => {
   
   pendentes,
   clientes,
-
- 
+  
   anotacoes,
   categoriasProdutos,
 categoriasDespesas,
@@ -1308,40 +1307,7 @@ useEffect(() => {
   return () => clearTimeout(timeout);
 }, [despesas, token, firstLoadDone, loaded]);
 
-// SAVE CONSUMO SEPARADO //
-useEffect(() => {
-  if (!token) return;
-  if (!consumoParaSalvar) return; // <- gatilho
 
-  const salvar = async () => {
-    try {
-      const res = await fetch(API + "/consumo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          itens: consumoParaSalvar.itens,
-          descricao: consumoParaSalvar.descricao
-        })
-      });
-
-      const data = await res.json();
-
-      if (data?.success) {
-        setConsumos((prev) => [data.consumo, ...prev]);
-      }
-
-    } catch (err) {
-      console.log("ERRO SAVE CONSUMO:", err);
-    } finally {
-      setConsumoParaSalvar(null); // limpa gatilho
-    }
-  };
-
-  salvar();
-}, [consumoParaSalvar, token]);
 
 // historico // 
 useEffect(() => {
