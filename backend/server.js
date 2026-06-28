@@ -599,6 +599,47 @@ app.post("/despesas", async (req, res) => {
   }
 });
 
+app.post("/consumos", async (req, res) => {
+  try {
+    const { consumos } = req.body;
+
+    let caixa = await Caixa.findOne();
+
+    // se não existir caixa, cria
+    if (!caixa) {
+      caixa = new Caixa({
+        consumos: []
+      });
+    }
+
+    // garante array
+    if (!Array.isArray(caixa.consumos)) {
+      caixa.consumos = [];
+    }
+
+    // aqui você pode:
+    // 👉 substituir tudo
+    caixa.consumos = consumos;
+
+    // OU (mais comum) adicionar novos:
+    // caixa.consumos.push(...consumos);
+
+    await caixa.save();
+
+    return res.json({
+      success: true,
+      consumos: caixa.consumos
+    });
+
+  } catch (err) {
+    console.log("ERRO POST CONSUMOS:", err);
+
+    return res.status(500).json({
+      error: "Erro ao salvar consumos"
+    });
+  }
+});
+
 app.get("/consumos", async (req, res) => {
 
   try {
@@ -628,3 +669,4 @@ app.get("/consumos", async (req, res) => {
   }
 
 });
+
