@@ -1309,33 +1309,39 @@ useEffect(() => {
 }, [despesas, token, firstLoadDone, loaded]);
 
 // SAVE CONSUMO SEPARADO //
-const salvarConsumo = async ({ itens, descricao }) => {
+useEffect(() => {
   if (!token) return;
+  if (!consumoParaSalvar) return; // <- gatilho
 
-  try {
-    const res = await fetch(API + "/consumo", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        itens,
-        descricao
-      })
-    });
+  const salvar = async () => {
+    try {
+      const res = await fetch(API + "/consumo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          itens: consumoParaSalvar.itens,
+          descricao: consumoParaSalvar.descricao
+        })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data?.success) {
-      // atualiza frontend sem reload
-      setConsumos((prev) => [data.consumo, ...prev]);
+      if (data?.success) {
+        setConsumos((prev) => [data.consumo, ...prev]);
+      }
+
+    } catch (err) {
+      console.log("ERRO SAVE CONSUMO:", err);
+    } finally {
+      setConsumoParaSalvar(null); // limpa gatilho
     }
+  };
 
-  } catch (err) {
-    console.log("ERRO AO SALVAR CONSUMO:", err);
-  }
-};
+  salvar();
+}, [consumoParaSalvar, token]);
 
 // historico // 
 useEffect(() => {
