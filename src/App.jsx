@@ -1220,6 +1220,7 @@ useEffect(() => {
   pendentes,
   clientes,
   
+  consumo,
   anotacoes,
   categoriasProdutos,
 categoriasDespesas,
