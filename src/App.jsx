@@ -1309,7 +1309,6 @@ useEffect(() => {
 }, [despesas, token, firstLoadDone, loaded]);
 
 
-
 // historico // 
 useEffect(() => {
 
