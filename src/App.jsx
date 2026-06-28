@@ -1160,27 +1160,32 @@ useEffect(() => {
 }, [token]);
 
 // LOAD CONSUMO SEPARADO //
-
 useEffect(() => {
   if (!token) return;
 
-  fetch(API + "/consumos")
-    .then(r => r.json())
-    .then(data => {
-      console.log("📦 CONSUMOS:", data);
+  const loadConsumos = async () => {
+    try {
+      const res = await fetch(API + "/consumos", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      });
 
-      if (Array.isArray(data)) {
-        setConsumos(data);
-      } else {
-        setConsumos([]);
-      }
-    })
-    .catch(err => {
-      console.log("❌ ERRO CONSUMOS:", err);
-      setConsumos([]);
-    });
+      const data = await res.json();
 
+      setConsumos(data || []);
+
+    } catch (err) {
+      console.log("ERRO LOAD CONSUMOS:", err);
+    }
+  };
+
+  loadConsumos();
 }, [token]);
+
+
 
 // ===== BLOCO: SAVE (SALVAR NO BACKEND - AUTO SAVE) =====
 // Salva automaticamente quando algo muda
@@ -1304,21 +1309,35 @@ useEffect(() => {
 }, [despesas, token, firstLoadDone, loaded]);
 
 // SAVE CONSUMO SEPARADO //
-useEffect(() => {
+const salvarConsumo = async (itens, descricao) => {
   if (!token) return;
 
-  fetch(API + "/consumos", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      consumos
-    })
-  });
-}, [consumos, token]);
+  try {
+    const res = await fetch(API + "/consumo", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        itens,
+        descricao
+      })
+    });
 
+    const data = await res.json();
+
+    if (data?.success) {
+      // só atualiza UI, sem reload
+      setConsumos((prev) => [data.consumo, ...prev]);
+    }
+
+  } catch (err) {
+    console.log("ERRO SALVAR CONSUMO:", err);
+  }
+};
+
+// historico // 
 useEffect(() => {
 
   const historicoSalvo =
