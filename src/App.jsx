@@ -1309,7 +1309,7 @@ useEffect(() => {
 }, [despesas, token, firstLoadDone, loaded]);
 
 // SAVE CONSUMO SEPARADO //
-const salvarConsumo = async (itens, descricao) => {
+const salvarConsumo = async ({ itens, descricao }) => {
   if (!token) return;
 
   try {
@@ -1328,12 +1328,12 @@ const salvarConsumo = async (itens, descricao) => {
     const data = await res.json();
 
     if (data?.success) {
-      // só atualiza UI, sem reload
+      // atualiza frontend sem reload
       setConsumos((prev) => [data.consumo, ...prev]);
     }
 
   } catch (err) {
-    console.log("ERRO SALVAR CONSUMO:", err);
+    console.log("ERRO AO SALVAR CONSUMO:", err);
   }
 };
 
