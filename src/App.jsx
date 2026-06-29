@@ -130,59 +130,55 @@ const [filtroAplicadoConsumo, setFiltroAplicadoConsumo] = useState(false);
 
 const consumosFiltrados = consumos.filter(c => {
 
-let dataConsumo;
+  let dataConsumo = new Date(c.data);
 
-if(c.data.includes("-")){
+  if (isNaN(dataConsumo.getTime())) {
 
-const [ano, mes, dia] = c.data.split("-");
+    if (c.data.includes("/")) {
 
-dataConsumo = new Date(
-Number(ano),
-Number(mes)-1,
-Number(dia)
-);
+      const [dia, mes, ano] = c.data.split("/");
 
-}else{
+      dataConsumo = new Date(
+        Number(ano),
+        Number(mes) - 1,
+        Number(dia)
+      );
 
-const [dia, mes, ano] = c.data.split("/");
+    } else {
 
-dataConsumo = new Date(
-Number(ano),
-Number(mes)-1,
-Number(dia)
-);
+      return false;
 
-}
+    }
 
-if(dataInicioConsumo){
+  }
 
-const inicio = new Date(dataInicioConsumo);
+  dataConsumo.setHours(0,0,0,0);
 
-inicio.setHours(0,0,0,0);
+  if (filtroAplicadoConsumo) {
 
-if(dataConsumo < inicio){
+    if (dataInicioConsumo) {
 
-return false;
+      const inicio = new Date(dataInicioConsumo);
 
-}
+      inicio.setHours(0,0,0,0);
 
-}
+      if (dataConsumo < inicio) return false;
 
-if(dataFimConsumo){
+    }
 
-const fim = new Date(dataFimConsumo);
+    if (dataFimConsumo) {
 
-fim.setHours(23,59,59,999);
+      const fim = new Date(dataFimConsumo);
 
-if(dataConsumo > fim){
+      fim.setHours(23,59,59,999);
 
-return false;
+      if (dataConsumo > fim) return false;
 
-}
+    }
 
-}
+  }
 
-return true;
+  return true;
 
 });
 
