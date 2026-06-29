@@ -17,6 +17,12 @@ const API = "https://caixa-ape-da-milla.onrender.com";
 // ===== BLOCO: FUNÇÃO UTILITÁRIA (safeNumber) =====
 // Converte valores para número com segurança (aceita vírgula, texto, etc)
 
+
+// ===== BLOCO: COMPONENTE PRINCIPAL =====
+
+export default function App() {
+
+
 const safeNumber = (value) => {
   if (value === null || value === undefined) return 0;
 
@@ -51,10 +57,6 @@ const cardStyle = {
 
   overflow: "hidden"
 };
-
-// ===== BLOCO: COMPONENTE PRINCIPAL =====
-
-export default function App() {
 
 const converterData = (valor) => {
 
