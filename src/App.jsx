@@ -57,7 +57,16 @@ const cardStyle = {
 
 export default function App() {
 
-
+const totalGastoConsumo = consumosFiltrados.reduce(
+  (total, c) =>
+    total +
+    (c.itens || []).reduce(
+      (soma, i) =>
+        soma + Number(i.preco || 0) * Number(i.qtd || 1),
+      0
+    ),
+  0
+);
 
   const normalizarData = (data) => {
   if (!data) return null;
@@ -8337,18 +8346,21 @@ setProdutos(prev =>
       marginTop: 20,
       marginBottom: 15
     }}
-  >
-    <div
-      style={{
-        color: "#aaa",
-        fontSize: 13
-      }}
-    >
-      📄 {consumosFiltrados.length} consumos encontrados
-    </div>
-  </div>
+  
+    
+  style={{
+    color: "#aaa",
+    fontSize: 13
+  }}
+>
+  📄 {consumosFiltrados.length} consumos encontrados
+</div>
 
-  {/* ================= LISTA ================= */}
+<h3 style={{ color: "#22c55e", marginTop: 10 }}>
+  💰 Total gasto: R$ {totalGastoConsumo.toFixed(2)}
+</h3>
+
+{/* ================= LISTA ================= */}
 
   {consumosFiltrados.map((c) => (
     <div
