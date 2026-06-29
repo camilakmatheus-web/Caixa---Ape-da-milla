@@ -293,19 +293,12 @@ const [valorDesconto, setValorDesconto] = useState("");
   const categoriasDespesa = [...new Set(despesas.map(d => d.categoria))];
   const [filtroDespesaCategoria, setFiltroDespesaCategoria] = useState(null);
 
-function excluirCategoriaDespesa(id) {
+// 👇 AQUI EMBAIXO
+const excluirCategoriaDespesa = (nome) => {
   setDespesas(prev =>
-    prev.map(d =>
-      d.categoriaId === id
-        ? { ...d, categoriaId: null }
-        : d
-    )
+    prev.filter(d => d.categoria !== nome)
   );
-
-  setCategoriasDespesas(prev =>
-    prev.filter(cat => cat.id !== id)
-  );
-}
+};
  
 const despesasFiltradas = despesas.filter(d => {
 
@@ -2601,46 +2594,60 @@ const baixarExtrato = () => {
       📊 Todas
     </div>
 
-    {categoriasDespesas.map(cat => (
+   {categoriasDespesas.map(cat => (
 
-      <div
-        key={cat.id}
-        onClick={() => {
-  setCategoriaDespesaSelecionada(cat.nome);
-  setModalHistoricoDespesa(true);
-}}
-        style={{
-          padding: 10,
-          borderRadius: 10,
-          background:
-            filtroDespesaCategoria === cat.nome
-              ? "#ff6a00"
-              : "#111",
-          color: "#fff",
-          cursor: "pointer",
-          border: "1px solid #333"
-        }}
-      >
-        📁 {cat.nome}
-      </div>
+  <div
+    key={cat.nome}
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: 10,
+      borderRadius: 10,
+      background:
+        filtroDespesaCategoria === cat.nome
+          ? "#ff6a00"
+          : "#111",
+      color: "#fff",
+      cursor: "pointer",
+      border: "1px solid #333",
+      marginBottom: 8
+    }}
+  >
+    {/* 👇 CLIQUE NA CATEGORIA */}
+    <div
+      onClick={() => {
+        setCategoriaDespesaSelecionada(cat.nome);
+        setModalHistoricoDespesa(true);
+      }}
+      style={{ flex: 1 }}
+    >
+      📁 {cat.nome}
+    </div>
 
-    ))}
-<button
-  onClick={() => excluirCategoriaDespesa(cat.id)}
-  style={{
-    marginLeft: 10,
-    background: "red",
-    color: "#fff",
-    border: "none",
-    padding: "4px 8px",
-    borderRadius: 6,
-    cursor: "pointer"
-  }}
->
-  ❌ Excluir
-</button>
+    {/* 🗑️ BOTÃO EXCLUIR */}
+    <button
+      onClick={(e) => {
+        e.stopPropagation(); // 👈 impede abrir o modal ao clicar no excluir
+
+        excluirCategoriaDespesa(cat.nome);
+      }}
+      style={{
+        marginLeft: 10,
+        background: "red",
+        color: "#fff",
+        border: "none",
+        padding: "4px 8px",
+        borderRadius: 6,
+        cursor: "pointer"
+      }}
+    >
+      ❌
+    </button>
   </div>
 
+))}
+ </div>
   {/* FORM */}
 
   <div style={{ marginBottom: 20 }}>
