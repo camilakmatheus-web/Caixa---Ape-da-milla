@@ -290,12 +290,7 @@ const [categoriasDespesasFixas, setCategoriasDespesasFixas] = useState([]);
   const [nomeDespesa, setNomeDespesa] = useState("");
   const [valorDespesa, setValorDespesa] = useState("");
   const [categoriaDespesa, setCategoriaDespesa] = useState("Geral");
-  const categoriasDespesas = [
-  ...new Set([
-    ...despesas.map(d => d.categoria),
-    ...categoriasDespesasFixas
-  ])
-];
+ 
   const [filtroDespesaCategoria, setFiltroDespesaCategoria] = useState(null);
   
 
