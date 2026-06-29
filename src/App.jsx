@@ -51,6 +51,11 @@ const cardStyle = {
 
   overflow: "hidden"
 };
+
+// ===== BLOCO: COMPONENTE PRINCIPAL =====
+
+export default function App() {
+
 const converterData = (valor) => {
 
   if (!valor) return null;
@@ -105,11 +110,6 @@ const converterData = (valor) => {
   return data;
 
 };
-// ===== BLOCO: COMPONENTE PRINCIPAL =====
-
-export default function App() {
-
-
 
   const normalizarData = (data) => {
   if (!data) return null;
