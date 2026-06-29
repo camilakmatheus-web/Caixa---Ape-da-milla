@@ -3948,7 +3948,12 @@ fontSize:16
     width: 330,
 
     background:
-      "linear-gradient(160deg,#ffbf57 0%,#ff9a2f 28%,#ff7600 58%,#ff5600 100%)",
+"linear-gradient(160deg,#8d3600 0%,#b94c00 18%,#d86400 42%,#ef7c00 70%,#ff9a18 100%)",
+
+border: "1px solid rgba(255,180,70,.35)",
+
+boxShadow:
+"0 35px 80px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.15)",
 
     borderRadius: 28,
 
@@ -3984,15 +3989,18 @@ fontSize:16
       height: 260,
 
       background:
-        "radial-gradient(circle,#ffe39b 0%,#ff9b2d 45%,transparent 75%)",
+"radial-gradient(circle,#ffd77a 0%,#ff8c00 42%,transparent 75%)",
 
-      filter: "blur(70px)",
+opacity:.55,
+filter:"blur(85px)",
+
+
 
       top: -120,
 
       right: -120,
 
-      opacity: .9,
+      
 
       borderRadius: "50%"
     }}
@@ -4008,16 +4016,20 @@ fontSize:16
 
       height: 200,
 
-      background:
-        "radial-gradient(circle,#ff6400 0%,transparent 70%)",
+     background:
+"radial-gradient(circle,#5a1e00 0%,#d85b00 45%,transparent 70%)",
 
-      filter: "blur(70px)",
+opacity:.45,
+
+filter:"blur(90px)",
+
+      
 
       bottom: -100,
 
       left: -80,
 
-      opacity: .35,
+      
 
       borderRadius: "50%"
     }}
@@ -4130,130 +4142,134 @@ fontSize:16
         return (
 
           <div
-            key={p.id}
-            style={{
+  key={p.id}
+  style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "12px 15px",
+    borderRadius: 18,
 
-              display: "flex",
+    background:
+      i === 0
+        ? "linear-gradient(135deg,#2b1c00 0%,#6a4a00 35%,#c99810 68%,#f5d46a 100%)"
+        : i === 1
+        ? "linear-gradient(135deg,#222 0%,#7c7c7c 38%,#d8d8d8 70%,#8b8b8b 100%)"
+        : i === 2
+        ? "linear-gradient(135deg,#2d1407 0%,#7a431d 40%,#b87333 72%,#d89d67 100%)"
+        : "linear-gradient(135deg,#0d0d0d 0%,#171717 45%,#232323 100%)",
 
-              alignItems: "center",
+    backdropFilter: "blur(18px)",
 
-              justifyContent: "space-between",
+    border:
+      i === 0
+        ? "1px solid #111"
+        : i === 1
+        ? "1px solid rgba(255,255,255,.20)"
+        : i === 2
+        ? "1px solid #6c3d19"
+        : "1px solid rgba(255,255,255,.08)",
 
-              padding: "10px 14px",
+    boxShadow:
+      i === 0
+        ? "0 12px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.18)"
+        : "0 8px 18px rgba(0,0,0,.28)",
 
-              borderRadius: 16,
+    transition: ".25s"
+  }}
+>
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 12
+    }}
+  >
+    <div
+      style={{
+        width: 40,
+        height: 40,
+        borderRadius: 12,
 
-              background:
-                i === 0
-                  ? "rgba(255,255,255,.22)"
-                  : "rgba(15,15,15,.28)",
+        background:
+          i === 0
+            ? "linear-gradient(135deg,#101010,#2a2a2a)"
+            : i === 1
+            ? "linear-gradient(135deg,#2b2b2b,#555)"
+            : i === 2
+            ? "linear-gradient(135deg,#2a1608,#4a2a15)"
+            : "linear-gradient(135deg,#101010,#222)",
 
-              backdropFilter: "blur(16px)",
+        border: "1px solid rgba(255,255,255,.08)",
 
-              border:
-                i === 0
-                  ? "1px solid rgba(255,255,255,.22)"
-                  : "1px solid rgba(255,255,255,.08)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
 
-              boxShadow:
-                i === 0
-                  ? "0 10px 20px rgba(0,0,0,.15)"
-                  : "0 4px 10px rgba(0,0,0,.08)",
+        fontWeight: "bold",
+        fontSize: 15,
 
-              transition: ".25s"
-            }}
-          >
+        color: "#fff",
 
-            <div
-              style={{
-                display: "flex",
+        flexShrink: 0,
 
-                alignItems: "center",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,.08)"
+      }}
+    >
+      {medalhas[i] || `#${i + 1}`}
+    </div>
 
-                gap: 12
-              }}
-            >
+    <div>
+      <div
+        style={{
+          fontWeight: 700,
+          fontSize: 14,
+          color: "#fff",
+          textShadow: "0 1px 2px rgba(0,0,0,.35)"
+        }}
+      >
+        {p.nome}
+      </div>
 
-              <div
-                style={{
-                  width: 38,
+      <div
+        style={{
+          fontSize: 11,
+          marginTop: 2,
+          color: "rgba(255,255,255,.82)"
+        }}
+      >
+        Produto vendido
+      </div>
+    </div>
+  </div>
 
-                  height: 38,
+  <div
+    style={{
+      minWidth: 64,
+      textAlign: "center",
 
-                  borderRadius: 12,
+      padding: "7px 14px",
 
-                  background: "rgba(0,0,0,.22)",
+      borderRadius: 14,
 
-                  display: "flex",
+      background:
+        "linear-gradient(135deg,#101010,#232323)",
 
-                  alignItems: "center",
+      border:
+        "1px solid rgba(255,255,255,.12)",
 
-                  justifyContent: "center",
+      boxShadow:
+        "inset 0 1px 0 rgba(255,255,255,.05)",
 
-                  fontWeight: "bold",
+      fontWeight: 800,
+      fontSize: 15,
 
-                  fontSize: 15,
-
-                  flexShrink: 0
-                }}
-              >
-                {medalhas[i] || `#${i + 1}`}
-              </div>
-
-              <div>
-
-                <div
-                  style={{
-                    fontWeight: 700,
-
-                    fontSize: 14,
-
-                    color: "#fff"
-                  }}
-                >
-                  {p.nome}
-                </div>
-
-                <div
-                  style={{
-                    fontSize: 11,
-
-                    marginTop: 2,
-
-                    color: "rgba(255,255,255,.75)"
-                  }}
-                >
-                  Produto vendido
-                </div>
-
-              </div>
-
-            </div>
-
-            <div
-              style={{
-
-                minWidth: 58,
-
-                textAlign: "center",
-
-                padding: "6px 14px",
-
-                borderRadius: 999,
-
-                background: "rgba(0,0,0,.22)",
-
-                border: "1px solid rgba(255,255,255,.08)",
-
-                fontWeight: "bold",
-
-                fontSize: 14
-              }}
-            >
-              {p.total}
-            </div>
-
-          </div>
+      color: "#fff"
+    }}
+  >
+    {p.total}
+  </div>
+</div>
 
         );
 
