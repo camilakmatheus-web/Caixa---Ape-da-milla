@@ -8213,18 +8213,130 @@ setProdutos(prev =>
         </>
       ) : (
         <>
-          <h3>📜 Histórico</h3>
+  <h3>📜 Histórico</h3>
 
-          {consumos?.map((c) => (
-            <div key={c.id}>
-              {c.itens?.map((i, idx) => (
-                <div key={idx}>
-                  {i.nome} x{i.qtd}
-                </div>
-              ))}
-            </div>
-          ))}
-        </>
+  <div
+    style={{
+      display: "flex",
+      gap: 10,
+      marginBottom: 15,
+      flexWrap: "wrap",
+      alignItems: "end"
+    }}
+  >
+    <div style={{ flex: 1, minWidth: 140 }}>
+      <label style={{ fontSize: 12 }}>Data inicial</label>
+      <input
+        type="date"
+        value={dataInicioConsumo}
+        onChange={(e) => setDataInicioConsumo(e.target.value)}
+        style={{
+          width: "100%",
+          padding: 8,
+          borderRadius: 6,
+          border: "1px solid #444",
+          background: "#1a1a1a",
+          color: "#fff"
+        }}
+      />
+    </div>
+
+    <div style={{ flex: 1, minWidth: 140 }}>
+      <label style={{ fontSize: 12 }}>Data final</label>
+      <input
+        type="date"
+        value={dataFimConsumo}
+        onChange={(e) => setDataFimConsumo(e.target.value)}
+        style={{
+          width: "100%",
+          padding: 8,
+          borderRadius: 6,
+          border: "1px solid #444",
+          background: "#1a1a1a",
+          color: "#fff"
+        }}
+      />
+    </div>
+
+    <button
+      onClick={() => setFiltroAplicadoConsumo(true)}
+      style={{
+        background: "#2563eb",
+        color: "#fff",
+        border: "none",
+        padding: "9px 14px",
+        borderRadius: 8,
+        cursor: "pointer"
+      }}
+    >
+      🔍 Filtrar
+    </button>
+
+    <button
+      onClick={() => {
+        setDataInicioConsumo("");
+        setDataFimConsumo("");
+        setFiltroAplicadoConsumo(false);
+      }}
+      style={{
+        background: "#444",
+        color: "#fff",
+        border: "none",
+        padding: "9px 14px",
+        borderRadius: 8,
+        cursor: "pointer"
+      }}
+    >
+      ♻ Limpar
+    </button>
+  </div>
+
+  <div
+    style={{
+      marginBottom: 15,
+      color: "#aaa",
+      fontSize: 13
+    }}
+  >
+    Total encontrado: <b>{consumosFiltrados.length}</b>
+  </div>
+
+  {consumosFiltrados.map((c) => (
+    <div
+      key={c.id}
+      style={{
+        background: "#1a1a1a",
+        padding: 10,
+        borderRadius: 8,
+        marginBottom: 10
+      }}
+    >
+      <div
+        style={{
+          fontSize: 12,
+          color: "#999",
+          marginBottom: 8
+        }}
+      >
+        {new Date(c.data).toLocaleString("pt-BR")}
+      </div>
+
+      {c.itens?.map((i, idx) => (
+        <div
+          key={idx}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 4
+          }}
+        >
+          <span>{i.nome}</span>
+          <span>x{i.qtd}</span>
+        </div>
+      ))}
+    </div>
+  ))}
+</>
       )}
     </div>
   </div>
