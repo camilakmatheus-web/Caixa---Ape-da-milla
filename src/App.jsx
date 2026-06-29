@@ -100,7 +100,7 @@ const [estoqueIlimitadoTemp,
   const [modalCategoria, setModalCategoria] =
   useState(false);
   const [openHistoricoConsumo, setOpenHistoricoConsumo] = useState(false);
-  const [consumos, setConsumos] = useState([]);
+  const [consumo, setConsumos] = useState([]);
   const [buscaConsumo, setBuscaConsumo] = useState("");
   const [openConsumo, setOpenConsumo] = useState(false);
   const [carrinhoConsumo, setCarrinhoConsumo] = useState([]);
