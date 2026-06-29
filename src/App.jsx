@@ -285,7 +285,7 @@ const [valorDesconto, setValorDesconto] = useState("");
 
   // ===== BLOCO: DESPESAS =====
   // Controle de despesas do sistema
-
+const [categoriasDespesasFixas, setCategoriasDespesasFixas] = useState([]);
   const [despesas, setDespesas] = useState([]);
   const [nomeDespesa, setNomeDespesa] = useState("");
   const [valorDespesa, setValorDespesa] = useState("");
@@ -297,7 +297,7 @@ const [valorDesconto, setValorDesconto] = useState("");
   ])
 ];
   const [filtroDespesaCategoria, setFiltroDespesaCategoria] = useState(null);
-  const [categoriasDespesasFixas, setCategoriasDespesasFixas] = useState([]);
+  
 
 // 👇 AQUI EMBAIXO
 const excluirCategoriaDespesa = (nome) => {
