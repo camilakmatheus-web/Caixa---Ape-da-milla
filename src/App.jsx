@@ -53,10 +53,6 @@ const cardStyle = {
   overflow: "hidden"
 };
 
-// ===== BLOCO: COMPONENTE PRINCIPAL =====
-
-export default function App() {
-
 const totalGastoConsumo = consumosFiltrados.reduce(
   (total, c) =>
     total +
@@ -67,6 +63,10 @@ const totalGastoConsumo = consumosFiltrados.reduce(
     ),
   0
 );
+
+// ===== BLOCO: COMPONENTE PRINCIPAL =====
+
+export default function App() {
 
   const normalizarData = (data) => {
   if (!data) return null;
