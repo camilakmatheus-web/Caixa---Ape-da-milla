@@ -51,7 +51,60 @@ const cardStyle = {
 
   overflow: "hidden"
 };
+const converterData = (valor) => {
 
+  if (!valor) return null;
+
+  if (typeof valor !== "string") {
+    valor = String(valor);
+  }
+
+  let data;
+
+  if (valor.includes("T")) {
+
+    const [parteData] = valor.split("T");
+    const [ano, mes, dia] = parteData.split("-");
+
+    data = new Date(
+      Number(ano),
+      Number(mes) - 1,
+      Number(dia)
+    );
+
+  } else if (valor.includes("-")) {
+
+    const [ano, mes, dia] = valor.split("-");
+
+    data = new Date(
+      Number(ano),
+      Number(mes) - 1,
+      Number(dia)
+    );
+
+  } else if (valor.includes("/")) {
+
+    const [dia, mes, ano] = valor.split("/");
+
+    data = new Date(
+      Number(ano),
+      Number(mes) - 1,
+      Number(dia)
+    );
+
+  } else {
+
+    data = new Date(valor);
+
+  }
+
+  if (isNaN(data.getTime())) return null;
+
+  data.setHours(0, 0, 0, 0);
+
+  return data;
+
+};
 // ===== BLOCO: COMPONENTE PRINCIPAL =====
 
 export default function App() {
@@ -130,49 +183,33 @@ const [filtroAplicadoConsumo, setFiltroAplicadoConsumo] = useState(false);
 
 const consumosFiltrados = consumos.filter(c => {
 
-  let dataConsumo = new Date(c.data);
+  const dataConsumo = converterData(c.data);
 
-  if (isNaN(dataConsumo.getTime())) {
-
-    if (c.data.includes("/")) {
-
-      const [dia, mes, ano] = c.data.split("/");
-
-      dataConsumo = new Date(
-        Number(ano),
-        Number(mes) - 1,
-        Number(dia)
-      );
-
-    } else {
-
-      return false;
-
-    }
-
-  }
-
-  dataConsumo.setHours(0,0,0,0);
+  if (!dataConsumo) return false;
 
   if (filtroAplicadoConsumo) {
 
     if (dataInicioConsumo) {
 
-      const inicio = new Date(dataInicioConsumo);
+      const inicio = converterData(dataInicioConsumo);
 
-      inicio.setHours(0,0,0,0);
+      inicio.setHours(0, 0, 0, 0);
 
-      if (dataConsumo < inicio) return false;
+      if (dataConsumo < inicio) {
+        return false;
+      }
 
     }
 
     if (dataFimConsumo) {
 
-      const fim = new Date(dataFimConsumo);
+      const fim = converterData(dataFimConsumo);
 
-      fim.setHours(23,59,59,999);
+      fim.setHours(23, 59, 59, 999);
 
-      if (dataConsumo > fim) return false;
+      if (dataConsumo > fim) {
+        return false;
+      }
 
     }
 
