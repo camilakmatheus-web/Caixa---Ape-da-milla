@@ -1001,8 +1001,7 @@ const topProdutos = useMemo(() => {
     });
 
   return Object.values(mapa)
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 10);
+  .sort((a, b) => b.total - a.total);
 
 }, [vendas]);
 
@@ -4035,124 +4034,142 @@ fontSize:16
 
     ) : (
 
-      topProdutos.map((p, i) => {
+      <div
+  className="ranking-scroll"
+  style={{
+    maxHeight: 450,
+    overflowY: "auto",
+    paddingRight: 6,
+    display: "flex",
+    flexDirection: "column",
+    gap: 8
+  }}
+>
 
-        const medalhas = ["🥇", "🥈", "🥉"];
+{topProdutos.map((p, i) => {
 
-        return (
+  const medalhas = ["🥇", "🥈", "🥉"];
+
+  return (
+
+    <div
+      key={p.id}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+
+        padding: "10px 14px",
+
+        borderRadius: 14,
+
+        background:
+          i === 0
+            ? "linear-gradient(135deg,#ffbe55 0%,#ff9626 35%,#ff6a00 70%,#ff4d00 100%)"
+            : "linear-gradient(135deg,#ff9830 0%,#ff7410 55%,#ff5a00 100%)",
+
+        color: "#fff",
+
+        boxShadow:
+          i === 0
+            ? "0 10px 25px rgba(255,106,0,.35)"
+            : "0 4px 12px rgba(255,106,0,.15)",
+
+        transition: ".25s"
+      }}
+    >
+
+      {/* ESQUERDA */}
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12
+        }}
+      >
+
+        {/* POSIÇÃO */}
+
+        <div
+          style={{
+            width: 34,
+            height: 34,
+
+            borderRadius: 10,
+
+            background: "rgba(255,255,255,.18)",
+
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+
+            fontSize: 15,
+            fontWeight: "bold",
+
+            flexShrink: 0
+          }}
+        >
+          {medalhas[i] || `#${i + 1}`}
+        </div>
+
+        {/* INFORMAÇÕES */}
+
+        <div>
 
           <div
-            key={p.id}
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: 16,
-              borderRadius: 18,
-
-              background:
-                i === 0
-                  ? "linear-gradient(135deg, rgba(255,106,0,0.22), rgba(255,140,0,0.10))"
-                  : "rgba(255,255,255,0.04)",
-
-              border:
-                i === 0
-                  ? "1px solid rgba(255,140,0,0.35)"
-                  : "1px solid rgba(255,255,255,0.05)",
-
-              transform:
-                i === 0
-                  ? "scale(1.03)"
-                  : "scale(1)",
-
-              boxShadow:
-                i === 0
-                  ? "0 10px 30px rgba(255,106,0,0.15)"
-                  : "none",
-
-              transition: "0.25s"
+              fontWeight: 700,
+              fontSize: 14,
+              lineHeight: 1.2
             }}
           >
-
-            {/* ESQUERDA */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 14
-              }}
-            >
-
-              {/* POSIÇÃO */}
-              <div
-                style={{
-                  width: 42,
-                  height: 42,
-                  borderRadius: 14,
-
-                  background:
-                    i === 0
-                      ? "linear-gradient(135deg,#ff6a00,#ff9f43)"
-                      : "#1f1f28",
-
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-
-                  fontSize: 18,
-                  fontWeight: "bold",
-
-                  boxShadow:
-                    i === 0
-                      ? "0 6px 18px rgba(255,106,0,0.35)"
-                      : "none"
-                }}
-              >
-                {medalhas[i] || `#${i + 1}`}
-              </div>
-
-              {/* INFO */}
-              <div>
-                <div
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 15
-                  }}
-                >
-                  {p.nome}
-                </div>
-
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: "#888",
-                    marginTop: 2
-                  }}
-                >
-                  Produto vendido
-                </div>
-              </div>
-
-            </div>
-
-            {/* TOTAL */}
-            <div
-              style={{
-                fontSize: 22,
-                fontWeight: "bold",
-                color:
-                  i === 0
-                    ? "#ff9f43"
-                    : "#fff"
-              }}
-            >
-              {p.total}
-            </div>
-
+            {p.nome}
           </div>
 
-        );
-      })
+          <div
+            style={{
+              fontSize: 11,
+              opacity: .85,
+              marginTop: 2
+            }}
+          >
+            Produto vendido
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* QUANTIDADE */}
+
+      <div
+        style={{
+          background: "rgba(255,255,255,.18)",
+
+          padding: "6px 12px",
+
+          borderRadius: 999,
+
+          fontWeight: "bold",
+
+          fontSize: 14,
+
+          minWidth: 55,
+
+          textAlign: "center"
+        }}
+      >
+        {p.total}
+      </div>
+
+    </div>
+
+  );
+
+})}
+
+</div>
 
     )}
 

@@ -595,3 +595,29 @@ button:hover{
   box-shadow:
     0 20px 60px rgba(0,0,0,.5);
 }
+
+/* =======================
+   SCROLL RANKING
+======================= */
+
+.ranking-scroll::-webkit-scrollbar{
+    width:6px;
+}
+
+.ranking-scroll::-webkit-scrollbar-track{
+    background:#1d1d1d;
+    border-radius:20px;
+}
+
+.ranking-scroll::-webkit-scrollbar-thumb{
+    background:linear-gradient(
+        180deg,
+        #ffb347,
+        #ff6a00
+    );
+    border-radius:20px;
+}
+
+.ranking-scroll::-webkit-scrollbar-thumb:hover{
+    background:#ff8c1a;
+}
