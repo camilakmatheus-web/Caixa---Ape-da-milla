@@ -3940,177 +3940,78 @@ fontSize:16
     </div>
 
 
-
-   {/* 🏆 COLUNA DIREITA (RANKING PREMIUM) */}
-
+{/* 🏆 COLUNA DIREITA (RANKING PREMIUM) */}
 <div
   style={{
-    width: 330,
-
+    width: 320,
     background:
-"linear-gradient(160deg,#8d3600 0%,#b94c00 18%,#d86400 42%,#ef7c00 70%,#ff9a18 100%)",
-
-border: "1px solid rgba(255,180,70,.35)",
-
-boxShadow:
-"0 35px 80px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.15)",
-
-    borderRadius: 28,
-
+      "linear-gradient(180deg, rgba(25,25,35,0.95), rgba(10,10,15,0.98))",
+    backdropFilter: "blur(18px)",
+    borderRadius: 24,
     padding: 22,
-
     color: "#fff",
-
     height: "fit-content",
-
     position: "sticky",
-
     top: 90,
-
-    overflow: "hidden",
-
-    border: "1px solid rgba(255,255,255,.18)",
-
+    border: "1px solid rgba(255,255,255,0.08)",
     boxShadow:
-      "0 25px 70px rgba(255,110,0,.38)",
-
-    backdropFilter: "blur(20px)"
+      "0 15px 40px rgba(0,0,0,0.45)",
+    overflow: "hidden"
   }}
 >
 
-  {/* GLOW SUPERIOR */}
-
+  {/* GLOW */}
   <div
     style={{
       position: "absolute",
-
-      width: 260,
-
-      height: 260,
-
-      background:
-"radial-gradient(circle,#ffd77a 0%,#ff8c00 42%,transparent 75%)",
-
-opacity:.55,
-filter:"blur(85px)",
-
-
-
-      top: -120,
-
-      right: -120,
-
-      
-
-      borderRadius: "50%"
-    }}
-  />
-
-  {/* GLOW INFERIOR */}
-
-  <div
-    style={{
-      position: "absolute",
-
-      width: 200,
-
-      height: 200,
-
-     background:
-"radial-gradient(circle,#5a1e00 0%,#d85b00 45%,transparent 70%)",
-
-opacity:.45,
-
-filter:"blur(90px)",
-
-      
-
-      bottom: -100,
-
-      left: -80,
-
-      
-
+      width: 180,
+      height: 180,
+      background: "rgba(255,106,0,0.18)",
+      filter: "blur(90px)",
+      top: -50,
+      right: -50,
       borderRadius: "50%"
     }}
   />
 
   {/* HEADER */}
-
   <div
     style={{
       position: "relative",
-
       zIndex: 2,
-
-      marginBottom: 22
+      marginBottom: 25
     }}
   >
-
-    <div
+    <p
       style={{
         fontSize: 12,
-
+        color: "#888",
         letterSpacing: 2,
-
         textTransform: "uppercase",
-
-        color: "rgba(255,255,255,.80)",
-
-        fontWeight: 600
+        marginBottom: 8
       }}
     >
-      Dashboard
-    </div>
+      Ranking
+    </p>
 
     <h2
       style={{
-        marginTop: 8,
-
-        marginBottom: 8,
-
-        fontSize: 26,
-
-        fontWeight: 800
+        margin: 0,
+        fontSize: 24,
+        fontWeight: "bold"
       }}
     >
-      🏆 Ranking de Produtos
+      🏆 Mais Vendidos
     </h2>
-
-    <div
-      style={{
-        width: 75,
-
-        height: 4,
-
-        borderRadius: 999,
-
-        background:
-          "linear-gradient(90deg,#ffffff,#ffe7b5)"
-      }}
-    />
-
   </div>
 
   {/* LISTA */}
-
   <div
-    className="ranking-scroll"
     style={{
-      maxHeight: 470,
-
-      overflowY: "auto",
-
-      paddingRight: 6,
-
       display: "flex",
-
       flexDirection: "column",
-
-      gap: 8,
-
+      gap: 14,
       position: "relative",
-
       zIndex: 2
     }}
   >
@@ -4119,18 +4020,15 @@ filter:"blur(90px)",
 
       <div
         style={{
-          padding: 25,
-
-          borderRadius: 18,
-
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: 16,
+          padding: 20,
           textAlign: "center",
-
-          background: "rgba(255,255,255,.12)",
-
-          border: "1px solid rgba(255,255,255,.15)"
+          color: "#777"
         }}
       >
-        Nenhuma venda registrada
+        Nenhuma venda ainda
       </div>
 
     ) : (
@@ -4139,139 +4037,119 @@ filter:"blur(90px)",
 
         const medalhas = ["🥇", "🥈", "🥉"];
 
-   return (
-  <div
-    key={p.id}
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "14px 16px",
-      borderRadius: 18,
+        return (
 
-      background:
-        "linear-gradient(135deg,#131313 0%,#1a1a1a 55%,#242424 100%)",
+          <div
+            key={p.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: 16,
+              borderRadius: 18,
 
-      border:
-        i === 0
-          ? "1px solid rgba(255,215,0,.45)"
-          : i === 1
-          ? "1px solid rgba(220,220,220,.30)"
-          : i === 2
-          ? "1px solid rgba(205,127,50,.35)"
-          : "1px solid rgba(255,255,255,.06)",
+              background:
+                i === 0
+                  ? "linear-gradient(135deg, rgba(255,106,0,0.22), rgba(255,140,0,0.10))"
+                  : "rgba(255,255,255,0.04)",
 
-      borderLeft:
-        i === 0
-          ? "6px solid #FFD700"
-          : i === 1
-          ? "6px solid #C0C0C0"
-          : i === 2
-          ? "6px solid #CD7F32"
-          : "6px solid #2d2d2d",
+              border:
+                i === 0
+                  ? "1px solid rgba(255,140,0,0.35)"
+                  : "1px solid rgba(255,255,255,0.05)",
 
-      boxShadow:
-        i === 0
-          ? "0 12px 30px rgba(255,215,0,.15)"
-          : i === 1
-          ? "0 10px 25px rgba(255,255,255,.08)"
-          : i === 2
-          ? "0 10px 25px rgba(205,127,50,.12)"
-          : "0 8px 18px rgba(0,0,0,.35)",
+              transform:
+                i === 0
+                  ? "scale(1.03)"
+                  : "scale(1)",
 
-      transition: ".25s"
-    }}
-  >
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 14
-      }}
-    >
-      <div
-        style={{
-          width: 44,
-          height: 44,
-          borderRadius: 14,
+              boxShadow:
+                i === 0
+                  ? "0 10px 30px rgba(255,106,0,0.15)"
+                  : "none",
 
-          background:
-            i === 0
-              ? "linear-gradient(135deg,#3d2c00,#d4af37)"
-              : i === 1
-              ? "linear-gradient(135deg,#3b3b3b,#cfcfcf)"
-              : i === 2
-              ? "linear-gradient(135deg,#4b2a15,#cd7f32)"
-              : "linear-gradient(135deg,#1b1b1b,#2b2b2b)",
+              transition: "0.25s"
+            }}
+          >
 
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+            {/* ESQUERDA */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 14
+              }}
+            >
 
-          color: "#fff",
-          fontSize: 18,
-          fontWeight: 700,
+              {/* POSIÇÃO */}
+              <div
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: 14,
 
-          boxShadow: "inset 0 1px 2px rgba(255,255,255,.15)"
-        }}
-      >
-        {medalhas[i] || `#${i + 1}`}
-      </div>
+                  background:
+                    i === 0
+                      ? "linear-gradient(135deg,#ff6a00,#ff9f43)"
+                      : "#1f1f28",
 
-      <div>
-        <div
-          style={{
-            fontSize: 15,
-            fontWeight: 700,
-            color: "#fff",
-            marginBottom: 3
-          }}
-        >
-          {p.nome}
-        </div>
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
 
-        <div
-          style={{
-            fontSize: 11,
-            color: "#8f8f8f",
-            letterSpacing: .5
-          }}
-        >
-          Produto vendido
-        </div>
-      </div>
-    </div>
+                  fontSize: 18,
+                  fontWeight: "bold",
 
-    <div
-      style={{
-        minWidth: 68,
+                  boxShadow:
+                    i === 0
+                      ? "0 6px 18px rgba(255,106,0,0.35)"
+                      : "none"
+                }}
+              >
+                {medalhas[i] || `#${i + 1}`}
+              </div>
 
-        textAlign: "center",
+              {/* INFO */}
+              <div>
+                <div
+                  style={{
+                    fontWeight: 600,
+                    fontSize: 15
+                  }}
+                >
+                  {p.nome}
+                </div>
 
-        padding: "8px 16px",
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "#888",
+                    marginTop: 2
+                  }}
+                >
+                  Produto vendido
+                </div>
+              </div>
 
-        borderRadius: 999,
+            </div>
 
-        background:
-          "linear-gradient(180deg,#2c2c2c,#181818)",
+            {/* TOTAL */}
+            <div
+              style={{
+                fontSize: 22,
+                fontWeight: "bold",
+                color:
+                  i === 0
+                    ? "#ff9f43"
+                    : "#fff"
+              }}
+            >
+              {p.total}
+            </div>
 
-        border: "1px solid rgba(255,255,255,.08)",
+          </div>
 
-        color: "#fff",
-
-        fontWeight: 800,
-
-        fontSize: 15,
-
-        boxShadow:
-          "inset 0 1px 0 rgba(255,255,255,.05)"
-      }}
-    >
-      {p.total}
-    </div>
-  </div>
-);
-
+        );
       })
 
     )}
@@ -4283,8 +4161,7 @@ filter:"blur(90px)",
 
 </div>
 )}
- 
-    
+     
         {tab === "reset" && (
   <div className="reset-page">
 
