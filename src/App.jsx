@@ -1,4 +1,4 @@
-       // ===== BLOCO: IMPORTAÇÕES =====
+        // ===== BLOCO: IMPORTAÇÕES =====
 // Importa Firebase (auth), bibliotecas externas e hooks do React
 
 import { auth, provider } from "./firebase";
@@ -285,21 +285,13 @@ const [valorDesconto, setValorDesconto] = useState("");
 
   // ===== BLOCO: DESPESAS =====
   // Controle de despesas do sistema
-const [categoriasDespesasFixas, setCategoriasDespesasFixas] = useState([]);
+
   const [despesas, setDespesas] = useState([]);
   const [nomeDespesa, setNomeDespesa] = useState("");
   const [valorDespesa, setValorDespesa] = useState("");
   const [categoriaDespesa, setCategoriaDespesa] = useState("Geral");
- 
+  const categoriasDespesa = [...new Set(despesas.map(d => d.categoria))];
   const [filtroDespesaCategoria, setFiltroDespesaCategoria] = useState(null);
-  
-
-// 👇 AQUI EMBAIXO
-const excluirCategoriaDespesa = (nome) => {
-  setCategoriasDespesasFixas(prev =>
-    prev.filter(c => c !== nome)
-  );
-};
  
 const despesasFiltradas = despesas.filter(d => {
 
@@ -2595,60 +2587,33 @@ const baixarExtrato = () => {
       📊 Todas
     </div>
 
-   {categoriasDespesas.map(cat => (
+    {categoriasDespesas.map(cat => (
 
-  <div
-    key={cat.nome}
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      padding: 10,
-      borderRadius: 10,
-      background:
-        filtroDespesaCategoria === cat.nome
-          ? "#ff6a00"
-          : "#111",
-      color: "#fff",
-      cursor: "pointer",
-      border: "1px solid #333",
-      marginBottom: 8
-    }}
-  >
-    {/* 👇 CLIQUE NA CATEGORIA */}
-    <div
-      onClick={() => {
-        setCategoriaDespesaSelecionada(cat.nome);
-        setModalHistoricoDespesa(true);
-      }}
-      style={{ flex: 1 }}
-    >
-      📁 {cat.nome}
-    </div>
+      <div
+        key={cat.id}
+        onClick={() => {
+  setCategoriaDespesaSelecionada(cat.nome);
+  setModalHistoricoDespesa(true);
+}}
+        style={{
+          padding: 10,
+          borderRadius: 10,
+          background:
+            filtroDespesaCategoria === cat.nome
+              ? "#ff6a00"
+              : "#111",
+          color: "#fff",
+          cursor: "pointer",
+          border: "1px solid #333"
+        }}
+      >
+        📁 {cat.nome}
+      </div>
 
-    {/* 🗑️ BOTÃO EXCLUIR */}
-    <button
-      onClick={(e) => {
-        e.stopPropagation(); // 👈 impede abrir o modal ao clicar no excluir
+    ))}
 
-        excluirCategoriaDespesa(cat.nome);
-      }}
-      style={{
-        marginLeft: 10,
-        background: "red",
-        color: "#fff",
-        border: "none",
-        padding: "4px 8px",
-        borderRadius: 6,
-        cursor: "pointer"
-      }}
-    >
-      ❌
-    </button>
   </div>
 
-))}
- </div>
   {/* FORM */}
 
   <div style={{ marginBottom: 20 }}>
@@ -8443,4 +8408,3 @@ setProdutos(prev =>
   </div>
 );
 }
-  
