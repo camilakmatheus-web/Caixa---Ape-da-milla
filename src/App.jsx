@@ -53,16 +53,6 @@ const cardStyle = {
   overflow: "hidden"
 };
 
-const totalGastoConsumo = consumosFiltrados.reduce(
-  (total, c) =>
-    total +
-    (c.itens || []).reduce(
-      (soma, i) =>
-        soma + Number(i.preco || 0) * Number(i.qtd || 1),
-      0
-    ),
-  0
-);
 
 // ===== BLOCO: COMPONENTE PRINCIPAL =====
 
@@ -231,6 +221,17 @@ const consumosFiltrados = consumos.filter(c => {
   return true;
 
 });
+
+const totalGastoConsumo = consumosFiltrados.reduce(
+  (total, c) =>
+    total +
+    (c.itens || []).reduce(
+      (soma, i) =>
+        soma + Number(i.preco || 0) * Number(i.qtd || 1),
+      0
+    ),
+  0
+);
 
   const [modalHistoricoDespesa,setModalHistoricoDespesa] = useState(false);
 
@@ -8359,6 +8360,7 @@ setProdutos(prev =>
 <h3 style={{ color: "#22c55e", marginTop: 10 }}>
   💰 Total gasto: R$ {totalGastoConsumo.toFixed(2)}
 </h3>
+
 
 {/* ================= LISTA ================= */}
 
