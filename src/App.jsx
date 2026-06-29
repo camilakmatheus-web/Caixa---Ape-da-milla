@@ -292,6 +292,20 @@ const [valorDesconto, setValorDesconto] = useState("");
   const [categoriaDespesa, setCategoriaDespesa] = useState("Geral");
   const categoriasDespesa = [...new Set(despesas.map(d => d.categoria))];
   const [filtroDespesaCategoria, setFiltroDespesaCategoria] = useState(null);
+
+function excluirCategoriaDespesa(id) {
+  setDespesas(prev =>
+    prev.map(d =>
+      d.categoriaId === id
+        ? { ...d, categoriaId: null }
+        : d
+    )
+  );
+
+  setCategoriasDespesas(prev =>
+    prev.filter(cat => cat.id !== id)
+  );
+}
  
 const despesasFiltradas = despesas.filter(d => {
 
@@ -2611,7 +2625,20 @@ const baixarExtrato = () => {
       </div>
 
     ))}
-
+<button
+  onClick={() => excluirCategoriaDespesa(cat.id)}
+  style={{
+    marginLeft: 10,
+    background: "red",
+    color: "#fff",
+    border: "none",
+    padding: "4px 8px",
+    borderRadius: 6,
+    cursor: "pointer"
+  }}
+>
+  ❌ Excluir
+</button>
   </div>
 
   {/* FORM */}
