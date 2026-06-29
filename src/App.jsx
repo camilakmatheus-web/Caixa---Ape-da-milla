@@ -407,21 +407,6 @@ const possuiQuitacaoParcial = possuiPendencias &&
     );
 
  
-
-// converter data//
-
-const converterData = (data) => {
-
-  if (!data) return new Date();
-
-  const [dia, mes, ano] = data.split("/");
-
-  return new Date(
-    Number(ano),
-    Number(mes) - 1,
-    Number(dia)
-  );
-};
   // ===== BLOCO: CLIENTES =====
   // Controle de cliente selecionado e cadastro
 
