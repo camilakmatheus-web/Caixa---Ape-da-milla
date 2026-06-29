@@ -18,11 +18,6 @@ const API = "https://caixa-ape-da-milla.onrender.com";
 // Converte valores para número com segurança (aceita vírgula, texto, etc)
 
 
-// ===== BLOCO: COMPONENTE PRINCIPAL =====
-
-export default function App() {
-
-
 const safeNumber = (value) => {
   if (value === null || value === undefined) return 0;
 
@@ -58,60 +53,11 @@ const cardStyle = {
   overflow: "hidden"
 };
 
-const converterData = (valor) => {
+// ===== BLOCO: COMPONENTE PRINCIPAL =====
 
-  if (!valor) return null;
+export default function App() {
 
-  if (typeof valor !== "string") {
-    valor = String(valor);
-  }
 
-  let data;
-
-  if (valor.includes("T")) {
-
-    const [parteData] = valor.split("T");
-    const [ano, mes, dia] = parteData.split("-");
-
-    data = new Date(
-      Number(ano),
-      Number(mes) - 1,
-      Number(dia)
-    );
-
-  } else if (valor.includes("-")) {
-
-    const [ano, mes, dia] = valor.split("-");
-
-    data = new Date(
-      Number(ano),
-      Number(mes) - 1,
-      Number(dia)
-    );
-
-  } else if (valor.includes("/")) {
-
-    const [dia, mes, ano] = valor.split("/");
-
-    data = new Date(
-      Number(ano),
-      Number(mes) - 1,
-      Number(dia)
-    );
-
-  } else {
-
-    data = new Date(valor);
-
-  }
-
-  if (isNaN(data.getTime())) return null;
-
-  data.setHours(0, 0, 0, 0);
-
-  return data;
-
-};
 
   const normalizarData = (data) => {
   if (!data) return null;
@@ -182,6 +128,62 @@ const [filtroAplicadoConsumo, setFiltroAplicadoConsumo] = useState(false);
   const [clienteHistorico, setClienteHistorico] = useState(null);
   const [confirmarCancelamento, setConfirmarCancelamento] =
   useState(false);
+
+const converterData = (valor) => {
+
+  if (!valor) return null;
+
+  if (typeof valor !== "string") {
+    valor = String(valor);
+  }
+
+  let data;
+
+  if (valor.includes("T")) {
+
+    const [parteData] = valor.split("T");
+    const [ano, mes, dia] = parteData.split("-");
+
+    data = new Date(
+      Number(ano),
+      Number(mes) - 1,
+      Number(dia)
+    );
+
+  } else if (valor.includes("-")) {
+
+    const [ano, mes, dia] = valor.split("-");
+
+    data = new Date(
+      Number(ano),
+      Number(mes) - 1,
+      Number(dia)
+    );
+
+  } else if (valor.includes("/")) {
+
+    const [dia, mes, ano] = valor.split("/");
+
+    data = new Date(
+      Number(ano),
+      Number(mes) - 1,
+      Number(dia)
+    );
+
+  } else {
+
+    data = new Date(valor);
+
+  }
+
+  if (isNaN(data.getTime())) return null;
+
+  data.setHours(0, 0, 0, 0);
+
+  return data;
+
+};
+
 
 const consumosFiltrados = consumos.filter(c => {
 
