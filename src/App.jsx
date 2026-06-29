@@ -8212,94 +8212,121 @@ setProdutos(prev =>
           </div>
         </>
       ) : (
-        <>
+     <>
   <h3>📜 Histórico</h3>
 
-  <div
+  {/* ================= FILTRO ================= */}
+
+  <label
     style={{
-      display: "flex",
-      gap: 10,
-      marginBottom: 15,
-      flexWrap: "wrap",
-      alignItems: "end"
+      fontSize: 12,
+      color: "#aaa"
     }}
   >
-    <div style={{ flex: 1, minWidth: 140 }}>
-      <label style={{ fontSize: 12 }}>Data inicial</label>
-      <input
-        type="date"
-        value={dataInicioConsumo}
-        onChange={(e) => setDataInicioConsumo(e.target.value)}
-        style={{
-          width: "100%",
-          padding: 8,
-          borderRadius: 6,
-          border: "1px solid #444",
-          background: "#1a1a1a",
-          color: "#fff"
-        }}
-      />
-    </div>
+    Data inicial
+  </label>
 
-    <div style={{ flex: 1, minWidth: 140 }}>
-      <label style={{ fontSize: 12 }}>Data final</label>
-      <input
-        type="date"
-        value={dataFimConsumo}
-        onChange={(e) => setDataFimConsumo(e.target.value)}
-        style={{
-          width: "100%",
-          padding: 8,
-          borderRadius: 6,
-          border: "1px solid #444",
-          background: "#1a1a1a",
-          color: "#fff"
-        }}
-      />
-    </div>
-
-    <button
-      onClick={() => setFiltroAplicadoConsumo(true)}
-      style={{
-        background: "#2563eb",
-        color: "#fff",
-        border: "none",
-        padding: "9px 14px",
-        borderRadius: 8,
-        cursor: "pointer"
-      }}
-    >
-      🔍 Filtrar
-    </button>
-
-    <button
-      onClick={() => {
-        setDataInicioConsumo("");
-        setDataFimConsumo("");
-        setFiltroAplicadoConsumo(false);
-      }}
-      style={{
-        background: "#444",
-        color: "#fff",
-        border: "none",
-        padding: "9px 14px",
-        borderRadius: 8,
-        cursor: "pointer"
-      }}
-    >
-      ♻ Limpar
-    </button>
-  </div>
-
-  <div
+  <input
+    type="date"
+    value={dataInicioConsumo}
+    onChange={e => setDataInicioConsumo(e.target.value)}
     style={{
-      marginBottom: 15,
+      width: "100%",
+      padding: 10,
+      borderRadius: 10,
+      background: "#0f0f0f",
+      color: "#fff",
+      border: "1px solid #333"
+    }}
+  />
+
+  <label
+    style={{
+      fontSize: 12,
       color: "#aaa",
-      fontSize: 13
+      display: "block",
+      marginTop: 10
     }}
   >
-    Total encontrado: <b>{consumosFiltrados.length}</b>
+    Data final
+  </label>
+
+  <input
+    type="date"
+    value={dataFimConsumo}
+    onChange={e => setDataFimConsumo(e.target.value)}
+    style={{
+      width: "100%",
+      padding: 10,
+      borderRadius: 10,
+      background: "#0f0f0f",
+      color: "#fff",
+      border: "1px solid #333"
+    }}
+  />
+
+  <button
+    onClick={() => {
+      setFiltroAplicadoConsumo(true);
+    }}
+    style={{
+      background: "#ff6a00",
+      color: "#fff",
+      border: "none",
+      padding: "10px 18px",
+      borderRadius: 10,
+      cursor: "pointer",
+      fontWeight: "bold",
+      marginTop: 10,
+      width: "100%"
+    }}
+  >
+    🔎 Aplicar filtro
+  </button>
+
+  <button
+    onClick={() => {
+      setDataInicioConsumo("");
+      setDataFimConsumo("");
+      setFiltroAplicadoConsumo(false);
+    }}
+    style={{
+      marginTop: 10,
+      width: "100%",
+      padding: 10,
+      borderRadius: 12,
+      background: "#222",
+      color: "#fff",
+      border: "1px solid #444",
+      cursor: "pointer"
+    }}
+  >
+    🧹 Limpar período
+  </button>
+
+  {/* ================= RESUMO ================= */}
+
+  <div
+    style={{
+      background: "#181818",
+      borderRadius: 15,
+      padding: 18,
+      border: "1px solid #292929",
+      marginTop: 20,
+      marginBottom: 15
+    }}
+  >
+    <div
+      style={{
+        color: "#aaa",
+        fontSize: 13
+      }}
+    >
+      📄 {consumosFiltrados.length} consumos encontrados
+    </div>
   </div>
+
+  {/* ================= LISTA ================= */}
 
   {consumosFiltrados.map((c) => (
     <div
