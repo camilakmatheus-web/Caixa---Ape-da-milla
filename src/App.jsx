@@ -4139,139 +4139,138 @@ filter:"blur(90px)",
 
         const medalhas = ["🥇", "🥈", "🥉"];
 
-        return (
-
-          <div
-  key={p.id}
-  style={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "12px 15px",
-    borderRadius: 18,
-
-    background:
-      i === 0
-        ? "linear-gradient(135deg,#2b1c00 0%,#6a4a00 35%,#c99810 68%,#f5d46a 100%)"
-        : i === 1
-        ? "linear-gradient(135deg,#222 0%,#7c7c7c 38%,#d8d8d8 70%,#8b8b8b 100%)"
-        : i === 2
-        ? "linear-gradient(135deg,#2d1407 0%,#7a431d 40%,#b87333 72%,#d89d67 100%)"
-        : "linear-gradient(135deg,#0d0d0d 0%,#171717 45%,#232323 100%)",
-
-    backdropFilter: "blur(18px)",
-
-    border:
-      i === 0
-        ? "1px solid #111"
-        : i === 1
-        ? "1px solid rgba(255,255,255,.20)"
-        : i === 2
-        ? "1px solid #6c3d19"
-        : "1px solid rgba(255,255,255,.08)",
-
-    boxShadow:
-      i === 0
-        ? "0 12px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.18)"
-        : "0 8px 18px rgba(0,0,0,.28)",
-
-    transition: ".25s"
-  }}
->
+   return (
   <div
+    key={p.id}
     style={{
       display: "flex",
       alignItems: "center",
-      gap: 12
+      justifyContent: "space-between",
+      padding: "14px 16px",
+      borderRadius: 18,
+
+      background:
+        "linear-gradient(135deg,#131313 0%,#1a1a1a 55%,#242424 100%)",
+
+      border:
+        i === 0
+          ? "1px solid rgba(255,215,0,.45)"
+          : i === 1
+          ? "1px solid rgba(220,220,220,.30)"
+          : i === 2
+          ? "1px solid rgba(205,127,50,.35)"
+          : "1px solid rgba(255,255,255,.06)",
+
+      borderLeft:
+        i === 0
+          ? "6px solid #FFD700"
+          : i === 1
+          ? "6px solid #C0C0C0"
+          : i === 2
+          ? "6px solid #CD7F32"
+          : "6px solid #2d2d2d",
+
+      boxShadow:
+        i === 0
+          ? "0 12px 30px rgba(255,215,0,.15)"
+          : i === 1
+          ? "0 10px 25px rgba(255,255,255,.08)"
+          : i === 2
+          ? "0 10px 25px rgba(205,127,50,.12)"
+          : "0 8px 18px rgba(0,0,0,.35)",
+
+      transition: ".25s"
     }}
   >
     <div
       style={{
-        width: 40,
-        height: 40,
-        borderRadius: 12,
+        display: "flex",
+        alignItems: "center",
+        gap: 14
+      }}
+    >
+      <div
+        style={{
+          width: 44,
+          height: 44,
+          borderRadius: 14,
+
+          background:
+            i === 0
+              ? "linear-gradient(135deg,#3d2c00,#d4af37)"
+              : i === 1
+              ? "linear-gradient(135deg,#3b3b3b,#cfcfcf)"
+              : i === 2
+              ? "linear-gradient(135deg,#4b2a15,#cd7f32)"
+              : "linear-gradient(135deg,#1b1b1b,#2b2b2b)",
+
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+
+          color: "#fff",
+          fontSize: 18,
+          fontWeight: 700,
+
+          boxShadow: "inset 0 1px 2px rgba(255,255,255,.15)"
+        }}
+      >
+        {medalhas[i] || `#${i + 1}`}
+      </div>
+
+      <div>
+        <div
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            color: "#fff",
+            marginBottom: 3
+          }}
+        >
+          {p.nome}
+        </div>
+
+        <div
+          style={{
+            fontSize: 11,
+            color: "#8f8f8f",
+            letterSpacing: .5
+          }}
+        >
+          Produto vendido
+        </div>
+      </div>
+    </div>
+
+    <div
+      style={{
+        minWidth: 68,
+
+        textAlign: "center",
+
+        padding: "8px 16px",
+
+        borderRadius: 999,
 
         background:
-          i === 0
-            ? "linear-gradient(135deg,#101010,#2a2a2a)"
-            : i === 1
-            ? "linear-gradient(135deg,#2b2b2b,#555)"
-            : i === 2
-            ? "linear-gradient(135deg,#2a1608,#4a2a15)"
-            : "linear-gradient(135deg,#101010,#222)",
+          "linear-gradient(180deg,#2c2c2c,#181818)",
 
         border: "1px solid rgba(255,255,255,.08)",
 
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-
-        fontWeight: "bold",
-        fontSize: 15,
-
         color: "#fff",
 
-        flexShrink: 0,
+        fontWeight: 800,
 
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,.08)"
+        fontSize: 15,
+
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,.05)"
       }}
     >
-      {medalhas[i] || `#${i + 1}`}
-    </div>
-
-    <div>
-      <div
-        style={{
-          fontWeight: 700,
-          fontSize: 14,
-          color: "#fff",
-          textShadow: "0 1px 2px rgba(0,0,0,.35)"
-        }}
-      >
-        {p.nome}
-      </div>
-
-      <div
-        style={{
-          fontSize: 11,
-          marginTop: 2,
-          color: "rgba(255,255,255,.82)"
-        }}
-      >
-        Produto vendido
-      </div>
+      {p.total}
     </div>
   </div>
-
-  <div
-    style={{
-      minWidth: 64,
-      textAlign: "center",
-
-      padding: "7px 14px",
-
-      borderRadius: 14,
-
-      background:
-        "linear-gradient(135deg,#101010,#232323)",
-
-      border:
-        "1px solid rgba(255,255,255,.12)",
-
-      boxShadow:
-        "inset 0 1px 0 rgba(255,255,255,.05)",
-
-      fontWeight: 800,
-      fontSize: 15,
-
-      color: "#fff"
-    }}
-  >
-    {p.total}
-  </div>
-</div>
-
-        );
+);
 
       })
 
