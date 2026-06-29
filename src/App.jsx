@@ -290,13 +290,19 @@ const [valorDesconto, setValorDesconto] = useState("");
   const [nomeDespesa, setNomeDespesa] = useState("");
   const [valorDespesa, setValorDespesa] = useState("");
   const [categoriaDespesa, setCategoriaDespesa] = useState("Geral");
-  const categoriasDespesa = [...new Set(despesas.map(d => d.categoria))];
+  const categoriasDespesas = [
+  ...new Set([
+    ...despesas.map(d => d.categoria),
+    ...categoriasDespesasFixas
+  ])
+];
   const [filtroDespesaCategoria, setFiltroDespesaCategoria] = useState(null);
+  const [categoriasDespesasFixas, setCategoriasDespesasFixas] = useState([]);
 
 // 👇 AQUI EMBAIXO
 const excluirCategoriaDespesa = (nome) => {
-  setDespesas(prev =>
-    prev.filter(d => d.categoria !== nome)
+  setCategoriasDespesasFixas(prev =>
+    prev.filter(c => c !== nome)
   );
 };
  
