@@ -1264,12 +1264,13 @@ useEffect(() => {
 
 }, [token]);
 
-// LOAD CONSUMO SEPARADO //
+// LOAD CONSUMO SEPARADO
 useEffect(() => {
   if (!token) return;
 
   const loadConsumos = async () => {
     try {
+
       const res = await fetch(API + "/consumos", {
         method: "GET",
         headers: {
@@ -1278,16 +1279,25 @@ useEffect(() => {
         }
       });
 
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+
       const data = await res.json();
 
-      setConsumos(data || []);
+      if (Array.isArray(data)) {
+        setConsumos(data);
+      } else {
+        console.log("⚠️ Resposta inválida em /consumos:", data);
+      }
 
     } catch (err) {
-      console.log("ERRO LOAD CONSUMOS:", err);
+      console.log("❌ ERRO LOAD CONSUMOS:", err);
     }
   };
 
   loadConsumos();
+
 }, [token]);
 
 
@@ -1325,7 +1335,7 @@ useEffect(() => {
   pendentes,
   clientes,
   
-  consumos,
+  
   anotacoes,
   categoriasProdutos,
 categoriasDespesas,
@@ -1353,7 +1363,7 @@ categoriasDespesas,
   pendentes,
   clientes,
 
-  despesas,
+  
   anotacoes,
 
   categoriasProdutos,
@@ -1413,6 +1423,31 @@ useEffect(() => {
   return () => clearTimeout(timeout);
 }, [despesas, token, firstLoadDone, loaded]);
 
+
+// ===== SAVE CONSUMOS SEPARADO =====
+useEffect(() => {
+  if (!token || !firstLoadDone || !loaded) return;
+
+  // Evita salvar antes do primeiro carregamento
+  if (!consumos.length) return;
+
+  const timeout = setTimeout(() => {
+    fetch(API + "/consumos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(consumos)
+    })
+    .then(r => r.json())
+    .then(() => console.log("💾 CONSUMOS SALVOS"))
+    .catch(err => console.log("❌ ERRO CONSUMOS:", err));
+  }, 800);
+
+  return () => clearTimeout(timeout);
+
+}, [consumos, token, firstLoadDone, loaded]);
 
 // historico // 
 useEffect(() => {

@@ -253,7 +253,7 @@ app.post("/dados", async (req, res) => {
   clientes,
   
   anotacoes,
-  consumos, // 🔥 ADD ISSO
+  
   caixa
 } = req.body;
 
@@ -270,7 +270,7 @@ $set: {
   clientes: clientes ?? [],
   
   anotacoes: anotacoes ?? [],
-  consumos: consumos ?? [],   // 🔥 ADD ISSO
+  
   caixa: caixa,
   ajusteCaixa: req.body.ajusteCaixa ?? 0
 }
