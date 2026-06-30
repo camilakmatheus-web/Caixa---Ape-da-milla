@@ -955,7 +955,14 @@ setCaixa(0);
 
 });
 
-const totalDespesas = despesasFiltradasStats.reduce(
+// Total geral (NUNCA entra em filtros)
+const totalDespesas = despesas.reduce(
+  (s, d) => s + Number(d.valor || 0),
+  0
+);
+
+// Total somente para Estatísticas (obedece aos filtros)
+const totalDespesasStats = despesasFiltradasStats.reduce(
   (s, d) => s + Number(d.valor || 0),
   0
 );
@@ -2369,7 +2376,7 @@ const lucroEstoque = valorEstoqueVenda - investimento;
 
 // ================= ESTATÍSTICAS EXTRAS =================
 
-const despesasTotais = totalDespesas;
+const despesasTotais = totalDespesasStats;
 
 const margemLucro =
   faturamento > 0
