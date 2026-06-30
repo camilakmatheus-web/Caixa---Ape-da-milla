@@ -416,6 +416,7 @@ const [categoriasDespesas, setCategoriasDespesas] = useState([]);
   const [pendentes, setPendentes] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [menuPagamento, setMenuPagamento] = useState(false);
+  const [clienteReajuste, setClienteReajuste] = useState(null);
   
   // Bloqueio de quitação Total  //
 
@@ -467,21 +468,16 @@ const possuiQuitacaoParcial = possuiPendencias &&
   const [clienteQuitar, setClienteQuitar] = useState(null);
   const [valorQuitacao, setValorQuitacao] = useState("");
   
+const [subTab, setSubTab] = useState("cadastro");
+const [produtoSelecionado, setProdutoSelecionado] = useState(null);
 
-  const [subTab, setSubTab] = useState("cadastro");
-  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+const [filtroDataEstatistica, setFiltroDataEstatistica] = useState("");
+const [periodo, setPeriodo] = useState("7d");
 
-  
-  const [filtroDataEstatistica, setFiltroDataEstatistica] = useState("");
-  const [periodo, setPeriodo] = useState("7d");
-  const [caixa, setCaixa] = useState(0);
+const [caixa, setCaixa] = useState(0);
 
-  const [ajusteAberto, setAjusteAberto] = useState(false);
-  const [valorAjuste, setValorAjuste] = useState("");
- const vendasCliente = pendentes.filter(
-  p => p.cliente === clienteReajuste?.nome
-);
-
+const [ajusteAberto, setAjusteAberto] = useState(false);
+const [valorAjuste, setValorAjuste] = useState("");
 const totalDivida = vendasCliente.reduce(
   (soma, v) => soma + Number(v.total || 0),
   0
