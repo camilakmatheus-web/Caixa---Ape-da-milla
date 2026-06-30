@@ -5786,6 +5786,127 @@ fontSize:16
   <div style={{ padding: 20 }}>
     <h2 style={{ marginBottom: 20 }}>📊 Estatísticas</h2>
 
+{/* ================= FILTRO POR DATA ================= */}
+
+<div
+  style={{
+    background: "#111",
+    border: "1px solid #333",
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 20
+  }}
+>
+
+  <h3
+    style={{
+      marginTop: 0,
+      marginBottom: 15,
+      color: "#fff"
+    }}
+  >
+    📅 Filtro personalizado
+  </h3>
+
+  <div
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 10,
+      alignItems: "end"
+    }}
+  >
+
+    <div>
+      <label
+        style={{
+          display: "block",
+          color: "#aaa",
+          marginBottom: 5,
+          fontSize: 13
+        }}
+      >
+        Data inicial
+      </label>
+
+      <input
+        type="date"
+        value={dataInicioStats}
+        onChange={e => setDataInicioStats(e.target.value)}
+        style={{
+          padding: 8,
+          borderRadius: 8,
+          border: "1px solid #333",
+          background: "#1b1b1b",
+          color: "#fff"
+        }}
+      />
+    </div>
+
+    <div>
+      <label
+        style={{
+          display: "block",
+          color: "#aaa",
+          marginBottom: 5,
+          fontSize: 13
+        }}
+      >
+        Data final
+      </label>
+
+      <input
+        type="date"
+        value={dataFimStats}
+        onChange={e => setDataFimStats(e.target.value)}
+        style={{
+          padding: 8,
+          borderRadius: 8,
+          border: "1px solid #333",
+          background: "#1b1b1b",
+          color: "#fff"
+        }}
+      />
+    </div>
+
+    <button
+      onClick={() => setFiltroStats(true)}
+      style={{
+        padding: "10px 18px",
+        background: "#ff6a00",
+        color: "#fff",
+        border: "none",
+        borderRadius: 8,
+        cursor: "pointer",
+        fontWeight: "bold"
+      }}
+    >
+      🔎 Aplicar
+    </button>
+
+    <button
+      onClick={() => {
+        setDataInicioStats("");
+        setDataFimStats("");
+        setFiltroStats(false);
+      }}
+      style={{
+        padding: "10px 18px",
+        background: "#222",
+        color: "#fff",
+        border: "1px solid #444",
+        borderRadius: 8,
+        cursor: "pointer"
+      }}
+    >
+      🧹 Limpar
+    </button>
+
+  </div>
+
+</div>
+
+
     {/* FILTRO */}
     <div style={{ marginBottom: 20, display: "flex", gap: 10 }}>
       {["hoje","7d","14d","1m","3m","1y"].map(p => (
