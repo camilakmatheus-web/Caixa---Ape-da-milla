@@ -159,8 +159,6 @@ const vendasStats = vendas.filter(v => {
 
 });
 
-const vendasFiltradas = vendasStats;
-
 
 
 const converterData = (valor) => {
