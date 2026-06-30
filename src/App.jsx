@@ -280,7 +280,7 @@ const [clienteExcluir, setClienteExcluir] =
   const [desconto, setDesconto] = useState(0);
 const [modalDesconto, setModalDesconto] = useState(false);
 const [valorDesconto, setValorDesconto] = useState("");
-
+const [infoAberta, setInfoAberta] = useState(null);
 
 
   // ===== BLOCO: DESPESAS =====
@@ -986,13 +986,13 @@ const topProdutos = useMemo(() => {
         const id = item.id;
         const qtd = item.qtd || 1;
 
-        if (!mapa[id]) {
-          mapa[id] = {
-            id,
-            nome: item.nome,
-            total: 0
-          };
-        }
+        mapa[id] = {
+  id,
+  nome: item.nome,
+  total: 0,
+  preco: item.precoVenda || 0,
+  custo: item.preco || 0
+};
 
         mapa[id].total += qtd;
 
@@ -4039,117 +4039,172 @@ fontSize:16
 
       topProdutos.map((p, i) => {
 
-        const medalhas = ["🥇", "🥈", "🥉"];
+  const medalhas = ["🥇", "🥈", "🥉"];
 
-        return (
+  return (
 
+    <div
+      key={p.id}
+      style={{
+        position: "relative", // 👈 IMPORTANTE
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: 16,
+        borderRadius: 18,
+
+        background:
+          i === 0
+            ? "linear-gradient(135deg, rgba(255,106,0,0.22), rgba(255,140,0,0.10))"
+            : "rgba(255,255,255,0.04)",
+
+        border:
+          i === 0
+            ? "1px solid rgba(255,140,0,0.35)"
+            : "1px solid rgba(255,255,255,0.05)",
+
+        transform:
+          i === 0
+            ? "scale(1.03)"
+            : "scale(1)",
+
+        boxShadow:
+          i === 0
+            ? "0 10px 30px rgba(255,106,0,0.15)"
+            : "none",
+
+        transition: "0.25s"
+      }}
+    >
+
+      {/* ❓ BOTÃO INFO */}
+      <div
+        onClick={() =>
+          setInfoAberta(infoAberta === p.id ? null : p.id)
+        }
+        style={{
+          position: "absolute",
+          top: 8,
+          right: 8,
+          width: 18,
+          height: 18,
+          borderRadius: "50%",
+          background: "rgba(255,255,255,0.08)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 11,
+          cursor: "pointer"
+        }}
+      >
+        ?
+      </div>
+
+      {/* 🧾 MODAL */}
+      {infoAberta === p.id && (
+        <div
+          style={{
+            position: "absolute",
+            top: 30,
+            right: 8,
+            width: 170,
+            background: "#0f0f14",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 10,
+            padding: 10,
+            fontSize: 11,
+            zIndex: 999,
+            boxShadow: "0 10px 25px rgba(0,0,0,0.4)"
+          }}
+        >
+          <div>💰 Custo: R$ {p.custo}</div>
+          <div>💵 Venda: R$ {p.preco}</div>
+          <div>📦 Vendas: {p.total}</div>
+
+          <div style={{
+            marginTop: 6,
+            fontWeight: "bold",
+            color: "#4caf50"
+          }}>
+            Lucro: R$ {(p.preco - p.custo) * p.total}
+          </div>
+        </div>
+      )}
+
+      {/* ESQUERDA */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 14
+        }}
+      >
+
+        {/* POSIÇÃO */}
+        <div
+          style={{
+            width: 42,
+            height: 42,
+            borderRadius: 14,
+
+            background:
+              i === 0
+                ? "linear-gradient(135deg,#ff6a00,#ff9f43)"
+                : "#1f1f28",
+
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+
+            fontSize: 18,
+            fontWeight: "bold",
+
+            boxShadow:
+              i === 0
+                ? "0 6px 18px rgba(255,106,0,0.35)"
+                : "none"
+          }}
+        >
+          {medalhas[i] || `#${i + 1}`}
+        </div>
+
+        {/* INFO */}
+        <div>
           <div
-            key={p.id}
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: 16,
-              borderRadius: 18,
-
-              background:
-                i === 0
-                  ? "linear-gradient(135deg, rgba(255,106,0,0.22), rgba(255,140,0,0.10))"
-                  : "rgba(255,255,255,0.04)",
-
-              border:
-                i === 0
-                  ? "1px solid rgba(255,140,0,0.35)"
-                  : "1px solid rgba(255,255,255,0.05)",
-
-              transform:
-                i === 0
-                  ? "scale(1.03)"
-                  : "scale(1)",
-
-              boxShadow:
-                i === 0
-                  ? "0 10px 30px rgba(255,106,0,0.15)"
-                  : "none",
-
-              transition: "0.25s"
+              fontWeight: 600,
+              fontSize: 15
             }}
           >
+            {p.nome}
+          </div>
 
-            {/* ESQUERDA */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 14
-              }}
-            >
+          <div
+            style={{
+              fontSize: 11,
+              color: "#888",
+              marginTop: 2
+            }}
+          >
+            Produto vendido
+          </div>
+        </div>
 
-              {/* POSIÇÃO */}
-              <div
-                style={{
-                  width: 42,
-                  height: 42,
-                  borderRadius: 14,
+      </div>
 
-                  background:
-                    i === 0
-                      ? "linear-gradient(135deg,#ff6a00,#ff9f43)"
-                      : "#1f1f28",
-
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-
-                  fontSize: 18,
-                  fontWeight: "bold",
-
-                  boxShadow:
-                    i === 0
-                      ? "0 6px 18px rgba(255,106,0,0.35)"
-                      : "none"
-                }}
-              >
-                {medalhas[i] || `#${i + 1}`}
-              </div>
-
-              {/* INFO */}
-              <div>
-                <div
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 15
-                  }}
-                >
-                  {p.nome}
-                </div>
-
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: "#888",
-                    marginTop: 2
-                  }}
-                >
-                  Produto vendido
-                </div>
-              </div>
-
-            </div>
-
-            {/* TOTAL */}
-            <div
-              style={{
-                fontSize: 22,
-                fontWeight: "bold",
-                color:
-                  i === 0
-                    ? "#ff9f43"
-                    : "#fff"
-              }}
-            >
-              {p.total}
-            </div>
+      {/* TOTAL */}
+      <div
+        style={{
+          fontSize: 22,
+          fontWeight: "bold",
+          color:
+            i === 0
+              ? "#ff9f43"
+              : "#fff"
+        }}
+      >
+        {p.total}
+</div>
 
           </div>
 
@@ -4165,7 +4220,6 @@ fontSize:16
 
 </div>
 )}
-     
         
        
         {tab === "reset" && (
