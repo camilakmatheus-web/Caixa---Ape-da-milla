@@ -393,6 +393,21 @@ return true;
 const [categoriasDespesas, setCategoriasDespesas] = useState([]);
   const [novaCategoria, setNovaCategoria] = useState("");
   const [vendas, setVendas] = useState([]);
+  const vendasFiltradasEstatistica = filtroDataEstatistica
+  ? vendas.filter(v => {
+      if (!v.data) return false;
+
+      // normaliza formato
+      if (v.data.includes("/")) {
+        const [dia, mes, ano] = v.data.split("/");
+        const dataFormatada = `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+        return dataFormatada === filtroDataEstatistica;
+      }
+
+      return v.data === filtroDataEstatistica;
+    })
+  : vendas;
+
   const [historicoClientes, setHistoricoClientes] = useState(() => {
   return JSON.parse(
     localStorage.getItem("historicoClientes")
@@ -457,7 +472,7 @@ const possuiQuitacaoParcial = possuiPendencias &&
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
 
   const [periodo, setPeriodo] = useState("7d");
-
+  const [filtroDataEstatistica, setFiltroDataEstatistica] = useState("");
   const [caixa, setCaixa] = useState(0);
 
   const [ajusteAberto, setAjusteAberto] = useState(false);
@@ -2160,7 +2175,23 @@ const filtrarVendas = () => {
 // ================= VENDAS: FILTRADAS =================
 // Resultado após aplicar filtro de período
 
-const vendasFiltradas = filtrarVendas();
+const vendasFiltradasBase = filtrarVendas();
+
+const vendasFiltradas = filtroDataEstatistica
+  ? vendasFiltradasBase.filter(v => {
+      if (!v.data) return false;
+
+      // formato BR → ISO
+      if (v.data.includes("/")) {
+        const [dia, mes, ano] = v.data.split("/");
+        const dataFormatada = `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+        return dataFormatada === filtroDataEstatistica;
+      }
+
+      // formato ISO direto
+      return v.data === filtroDataEstatistica;
+    })
+  : vendasFiltradasBase;
 
 
 // ================= FINANCEIRO: FATURAMENTO =================
