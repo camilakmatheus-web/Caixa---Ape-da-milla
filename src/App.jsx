@@ -1,4 +1,4 @@
-        // ===== BLOCO: IMPORTAÇÕES =====
+         // ===== BLOCO: IMPORTAÇÕES =====
 // Importa Firebase (auth), bibliotecas externas e hooks do React
 
 import { auth, provider } from "./firebase";
@@ -393,21 +393,6 @@ return true;
 const [categoriasDespesas, setCategoriasDespesas] = useState([]);
   const [novaCategoria, setNovaCategoria] = useState("");
   const [vendas, setVendas] = useState([]);
-  const vendasFiltradasEstatistica = filtroDataEstatistica
-  ? vendas.filter(v => {
-      if (!v.data) return false;
-
-      // normaliza formato
-      if (v.data.includes("/")) {
-        const [dia, mes, ano] = v.data.split("/");
-        const dataFormatada = `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
-        return dataFormatada === filtroDataEstatistica;
-      }
-
-      return v.data === filtroDataEstatistica;
-    })
-  : vendas;
-
   const [historicoClientes, setHistoricoClientes] = useState(() => {
   return JSON.parse(
     localStorage.getItem("historicoClientes")
@@ -416,7 +401,6 @@ const [categoriasDespesas, setCategoriasDespesas] = useState([]);
   const [pendentes, setPendentes] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [menuPagamento, setMenuPagamento] = useState(false);
-  
   
   // Bloqueio de quitação Total  //
 
@@ -468,16 +452,20 @@ const possuiQuitacaoParcial = possuiPendencias &&
   const [clienteQuitar, setClienteQuitar] = useState(null);
   const [valorQuitacao, setValorQuitacao] = useState("");
   
-const [subTab, setSubTab] = useState("cadastro");
-const [produtoSelecionado, setProdutoSelecionado] = useState(null);
 
-const [filtroDataEstatistica, setFiltroDataEstatistica] = useState("");
-const [periodo, setPeriodo] = useState("7d");
+  const [subTab, setSubTab] = useState("cadastro");
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
 
-const [caixa, setCaixa] = useState(0);
+  const [periodo, setPeriodo] = useState("7d");
 
-const [ajusteAberto, setAjusteAberto] = useState(false);
-const [valorAjuste, setValorAjuste] = useState("");
+  const [caixa, setCaixa] = useState(0);
+
+  const [ajusteAberto, setAjusteAberto] = useState(false);
+  const [valorAjuste, setValorAjuste] = useState("");
+ const vendasCliente = pendentes.filter(
+  p => p.cliente === clienteReajuste?.nome
+);
+
 const totalDivida = vendasCliente.reduce(
   (soma, v) => soma + Number(v.total || 0),
   0
@@ -2149,13 +2137,14 @@ const totalHoje = vendasHoje.reduce(
 // ================= FILTRO: PERÍODO DE VENDAS =================
 // Filtra vendas por período selecionado (hoje, 7d, 1m etc)
 
-// função primeiro
 const filtrarVendas = () => {
   const hoje = new Date();
 
   return vendas.filter(v => {
     const dataVenda = dataParaDate(v.data);
-    const diff = (hoje - dataVenda) / (1000 * 60 * 60 * 24);
+
+    const diff =
+      (hoje - dataVenda) / (1000 * 60 * 60 * 24);
 
     if (periodo === "hoje") return diff < 1;
     if (periodo === "7d") return diff <= 7;
@@ -2168,23 +2157,11 @@ const filtrarVendas = () => {
   });
 };
 
-// depois usa
-const vendasFiltradasBase = filtrarVendas();
+// ================= VENDAS: FILTRADAS =================
+// Resultado após aplicar filtro de período
 
-// depois aplica filtro de data
-const vendasFiltradas = filtroDataEstatistica
-  ? vendasFiltradasBase.filter(v => {
-      if (!v.data) return false;
+const vendasFiltradas = filtrarVendas();
 
-      if (v.data.includes("/")) {
-        const [dia, mes, ano] = v.data.split("/");
-        const dataFormatada = `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
-        return dataFormatada === filtroDataEstatistica;
-      }
-
-      return v.data === filtroDataEstatistica;
-    })
-  : vendasFiltradasBase;
 
 // ================= FINANCEIRO: FATURAMENTO =================
 // Soma total das vendas filtradas
