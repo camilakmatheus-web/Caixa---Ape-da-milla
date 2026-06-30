@@ -434,76 +434,7 @@ app.put("/cancelar-venda/:id", async (req, res) => {
   }
 });
 
-app.post("/consumo", async (req, res) => {
-  try {
 
-    const { itens, descricao } = req.body;
-
-    const caixa = await Caixa.findOne({
-      userId: req.userId
-    });
-
-    if (!caixa) {
-      return res.status(404).json({
-        error: "Caixa não encontrado"
-      });
-    }
-
-    if (!Array.isArray(caixa.produtos)) {
-      caixa.produtos = [];
-    }
-
-    if (!Array.isArray(caixa.consumos)) {
-      caixa.consumos = [];
-    }
-
-    itens.forEach((item) => {
-
-      const produto = caixa.produtos.find((p) =>
-        String(p.id) === String(item.id) ||
-        String(p._id) === String(item.id)
-      );
-
-      if (!produto) return;
-
-      if (produto.estoqueIlimitado) return;
-
-      const qtd = Number(item.qtd || 1);
-
-      produto.estoque = Math.max(
-        0,
-        Number(produto.estoque || 0) - qtd
-      );
-
-    });
-
-    const novoConsumo = {
-      id: Date.now(),
-      descricao: descricao || "Consumo interno",
-      itens,
-      data: new Date()
-    };
-
-    caixa.consumos.unshift(novoConsumo);
-
-    await caixa.save();
-
-    return res.json({
-      success: true,
-      consumo: novoConsumo,
-      produtos: caixa.produtos
-    });
-
-  } catch (err) {
-
-    console.log("ERRO CONSUMO:", err);
-
-    return res.status(500).json({
-      error: "Erro ao registrar consumo"
-    });
-
-  }
-});
 
 
 // ===== GET VENDAS =====
@@ -591,6 +522,77 @@ app.post("/despesas", async (req, res) => {
   }
 });
 
+
+app.post("/consumo", async (req, res) => {
+  try {
+
+    const { itens, descricao } = req.body;
+
+    const caixa = await Caixa.findOne({
+      userId: req.userId
+    });
+
+    if (!caixa) {
+      return res.status(404).json({
+        error: "Caixa não encontrado"
+      });
+    }
+
+    if (!Array.isArray(caixa.produtos)) {
+      caixa.produtos = [];
+    }
+
+    if (!Array.isArray(caixa.consumos)) {
+      caixa.consumos = [];
+    }
+
+    itens.forEach((item) => {
+
+      const produto = caixa.produtos.find((p) =>
+        String(p.id) === String(item.id) ||
+        String(p._id) === String(item.id)
+      );
+
+      if (!produto) return;
+
+      if (produto.estoqueIlimitado) return;
+
+      const qtd = Number(item.qtd || 1);
+
+      produto.estoque = Math.max(
+        0,
+        Number(produto.estoque || 0) - qtd
+      );
+
+    });
+
+    const novoConsumo = {
+      id: Date.now(),
+      descricao: descricao || "Consumo interno",
+      itens,
+      data: new Date()
+    };
+
+    caixa.consumos.unshift(novoConsumo);
+
+    await caixa.save();
+
+    return res.json({
+      success: true,
+      consumo: novoConsumo,
+      produtos: caixa.produtos
+    });
+
+  } catch (err) {
+
+    console.log("ERRO CONSUMO:", err);
+
+    return res.status(500).json({
+      error: "Erro ao registrar consumo"
+    });
+
+  }
+});
 
 app.get("/consumos", async (req, res) => {
 
