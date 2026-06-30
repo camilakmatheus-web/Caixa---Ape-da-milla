@@ -2152,14 +2152,13 @@ const totalHoje = vendasHoje.reduce(
 // ================= FILTRO: PERÍODO DE VENDAS =================
 // Filtra vendas por período selecionado (hoje, 7d, 1m etc)
 
+// função primeiro
 const filtrarVendas = () => {
   const hoje = new Date();
 
   return vendas.filter(v => {
     const dataVenda = dataParaDate(v.data);
-
-    const diff =
-      (hoje - dataVenda) / (1000 * 60 * 60 * 24);
+    const diff = (hoje - dataVenda) / (1000 * 60 * 60 * 24);
 
     if (periodo === "hoje") return diff < 1;
     if (periodo === "7d") return diff <= 7;
@@ -2172,27 +2171,23 @@ const filtrarVendas = () => {
   });
 };
 
-// ================= VENDAS: FILTRADAS =================
-// Resultado após aplicar filtro de período
-
+// depois usa
 const vendasFiltradasBase = filtrarVendas();
 
+// depois aplica filtro de data
 const vendasFiltradas = filtroDataEstatistica
   ? vendasFiltradasBase.filter(v => {
       if (!v.data) return false;
 
-      // formato BR → ISO
       if (v.data.includes("/")) {
         const [dia, mes, ano] = v.data.split("/");
         const dataFormatada = `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
         return dataFormatada === filtroDataEstatistica;
       }
 
-      // formato ISO direto
       return v.data === filtroDataEstatistica;
     })
   : vendasFiltradasBase;
-
 
 // ================= FINANCEIRO: FATURAMENTO =================
 // Soma total das vendas filtradas
