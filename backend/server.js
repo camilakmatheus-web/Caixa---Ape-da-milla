@@ -439,11 +439,9 @@ app.post("/consumo", async (req, res) => {
 
     const { itens, descricao } = req.body;
 
-    // Enquanto não usa auth, pega o primeiro caixa
-    // Depois é só trocar por:
-    // const caixa = await Caixa.findOne({ userId: req.userId });
-
-    const caixa = await Caixa.findOne();
+    const caixa = await Caixa.findOne({
+      userId: req.userId
+    });
 
     if (!caixa) {
       return res.status(404).json({
@@ -451,7 +449,6 @@ app.post("/consumo", async (req, res) => {
       });
     }
 
-    // Garante os arrays
     if (!Array.isArray(caixa.produtos)) {
       caixa.produtos = [];
     }
@@ -460,7 +457,6 @@ app.post("/consumo", async (req, res) => {
       caixa.consumos = [];
     }
 
-    // Baixa estoque
     itens.forEach((item) => {
 
       const produto = caixa.produtos.find((p) =>
@@ -470,7 +466,6 @@ app.post("/consumo", async (req, res) => {
 
       if (!produto) return;
 
-      // Não baixa estoque ilimitado
       if (produto.estoqueIlimitado) return;
 
       const qtd = Number(item.qtd || 1);
@@ -482,7 +477,6 @@ app.post("/consumo", async (req, res) => {
 
     });
 
-    // Cria consumo
     const novoConsumo = {
       id: Date.now(),
       descricao: descricao || "Consumo interno",
@@ -490,10 +484,8 @@ app.post("/consumo", async (req, res) => {
       data: new Date()
     };
 
-    // Adiciona ao histórico
     caixa.consumos.unshift(novoConsumo);
 
-    // Salva alterações (estoque + histórico)
     await caixa.save();
 
     return res.json({
@@ -604,13 +596,14 @@ app.get("/consumos", async (req, res) => {
 
   try {
 
-    const caixa = await Caixa.findOne();
+    const caixa = await Caixa.findOne({
+      userId: req.userId
+    });
 
     if (!caixa) {
       return res.json([]);
     }
 
-    // Garante que consumos seja um array
     if (!Array.isArray(caixa.consumos)) {
       caixa.consumos = [];
       await caixa.save();
@@ -629,5 +622,4 @@ app.get("/consumos", async (req, res) => {
   }
 
 });
-
 
