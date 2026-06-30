@@ -621,3 +621,67 @@ button:hover{
 .ranking-scroll::-webkit-scrollbar-thumb:hover{
     background:#ff8c1a;
 }
+
+.ranking-container {
+  width: 100%;
+  max-width: 400px;
+  background: #111;
+  color: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+}
+
+.ranking-container h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.ranking-list {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* Scroll bonito */
+.ranking-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ranking-list::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+
+/* Itens */
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1c1c1c;
+  padding: 10px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+
+.item:hover {
+  background: #2a2a2a;
+}
+
+.pos {
+  width: 30px;
+  font-weight: bold;
+}
+
+.gold { color: gold; }
+.silver { color: silver; }
+.bronze { color: #cd7f32; }
+
+.nome {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.valor {
+  font-weight: bold;
+}
