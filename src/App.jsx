@@ -847,6 +847,8 @@ setCategoriasDespesas([]);
 
     console.log("ZEROU O CAIXA");
 setCaixa(0);
+setAjusteCaixa(0);
+setConsumos([]);
 
     alert("✅ Sistema resetado com sucesso!");
 

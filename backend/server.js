@@ -348,21 +348,22 @@ app.post("/resetar", async (req, res) => {
     await Caixa.updateMany(
       {},
       {
-        $set: {
-          produtos: [],
-          categoriasProdutos: [],
-          categoriasDespesas: [],
+       $set: {
+  produtos: [],
+  categoriasProdutos: [],
+  categoriasDespesas: [],
 
-          vendas: [],
-          pendentes: [],
-          clientes: [],
+  vendas: [],
+  pendentes: [],
+  clientes: [],
 
-          despesas: [],
-          anotacoes: [],
+  despesas: [],
+  anotacoes: [],
+  consumos: [],
 
-          caixa: 0,
-           ajusteCaixa: 0
-        }
+  caixa: 0,
+  ajusteCaixa: 0
+}
       }
     );
 
