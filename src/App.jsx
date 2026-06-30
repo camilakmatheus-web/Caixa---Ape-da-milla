@@ -3954,8 +3954,7 @@ fontSize:16
     position: "sticky",
     top: 90,
     border: "1px solid rgba(255,255,255,0.08)",
-    boxShadow:
-      "0 15px 40px rgba(0,0,0,0.45)",
+    boxShadow: "0 15px 40px rgba(0,0,0,0.45)",
     overflow: "hidden"
   }}
 >
@@ -3979,7 +3978,7 @@ fontSize:16
     style={{
       position: "relative",
       zIndex: 2,
-      marginBottom: 25
+      marginBottom: 20
     }}
   >
     <p
@@ -4012,12 +4011,13 @@ fontSize:16
       flexDirection: "column",
       gap: 14,
       position: "relative",
-      zIndex: 2
+      zIndex: 2,
+      maxHeight: 320,
+      overflowY: "auto",
+      paddingRight: 6
     }}
   >
-
     {topProdutos.length === 0 ? (
-
       <div
         style={{
           background: "rgba(255,255,255,0.04)",
@@ -4030,15 +4030,11 @@ fontSize:16
       >
         Nenhuma venda ainda
       </div>
-
     ) : (
-
       topProdutos.map((p, i) => {
-
         const medalhas = ["🥇", "🥈", "🥉"];
 
         return (
-
           <div
             key={p.id}
             style={{
@@ -4047,32 +4043,22 @@ fontSize:16
               justifyContent: "space-between",
               padding: 16,
               borderRadius: 18,
-
               background:
                 i === 0
                   ? "linear-gradient(135deg, rgba(255,106,0,0.22), rgba(255,140,0,0.10))"
                   : "rgba(255,255,255,0.04)",
-
               border:
                 i === 0
                   ? "1px solid rgba(255,140,0,0.35)"
                   : "1px solid rgba(255,255,255,0.05)",
-
-              transform:
-                i === 0
-                  ? "scale(1.03)"
-                  : "scale(1)",
-
+              transform: i === 0 ? "scale(1.03)" : "scale(1)",
               boxShadow:
                 i === 0
                   ? "0 10px 30px rgba(255,106,0,0.15)"
                   : "none",
-
               transition: "0.25s"
             }}
           >
-
-            {/* ESQUERDA */}
             <div
               style={{
                 display: "flex",
@@ -4080,26 +4066,20 @@ fontSize:16
                 gap: 14
               }}
             >
-
-              {/* POSIÇÃO */}
               <div
                 style={{
                   width: 42,
                   height: 42,
                   borderRadius: 14,
-
                   background:
                     i === 0
                       ? "linear-gradient(135deg,#ff6a00,#ff9f43)"
                       : "#1f1f28",
-
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-
                   fontSize: 18,
                   fontWeight: "bold",
-
                   boxShadow:
                     i === 0
                       ? "0 6px 18px rgba(255,106,0,0.35)"
@@ -4109,17 +4089,10 @@ fontSize:16
                 {medalhas[i] || `#${i + 1}`}
               </div>
 
-              {/* INFO */}
               <div>
-                <div
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 15
-                  }}
-                >
+                <div style={{ fontWeight: 600, fontSize: 15 }}>
                   {p.nome}
                 </div>
-
                 <div
                   style={{
                     fontSize: 11,
@@ -4130,22 +4103,17 @@ fontSize:16
                   Produto vendido
                 </div>
               </div>
-
             </div>
 
-            {/* TOTAL */}
             <div
               style={{
                 fontSize: 22,
                 fontWeight: "bold",
-                color:
-                  i === 0
-                    ? "#ff9f43"
-                    : "#fff"
+                color: i === 0 ? "#ff9f43" : "#fff"
               }}
             >
               {p.total}
-            </div>
+  </div>
 
           </div>
 
@@ -4161,7 +4129,10 @@ fontSize:16
 
 </div>
 )}
+ 
      
+        
+       
         {tab === "reset" && (
   <div className="reset-page">
 
