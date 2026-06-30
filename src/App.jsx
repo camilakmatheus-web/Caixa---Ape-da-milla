@@ -4014,7 +4014,7 @@ fontSize:16
       position: "relative",
       zIndex: 2,
 
-      maxHeight: 320,          // 👈 ALTURA LIMITADA
+      maxHeight: 520,          // 👈 ALTURA LIMITADA
       overflowY: "auto",       // 👈 SCROLL ATIVADO
       paddingRight: 6          // 👈 NÃO CORTA NO SCROLL
     }}
