@@ -858,32 +858,35 @@ if(!categoriaDespesa){
 }
 
  const adicionarDespesa = () => {
-  if (!nomeDespesa || !valorDespesa) return;
+
+  if (!categoriaDespesa || categoriaDespesa.trim() === "") {
+    alert("Selecione uma categoria");
+    return;
+  }
+
+  if (!nomeDespesa || !valorDespesa) {
+    alert("Preencha nome e valor");
+    return;
+  }
 
   const agora = new Date();
 
   setDespesas(prev => [
-{
-  id: Date.now(),
-
-  categoria: categoriaDespesa,
-
-  nome: nomeDespesa,
-
-  valor: safeNumber(valorDespesa),
-
-  data: agora.toISOString().split("T")[0],
-
-  hora: agora.toTimeString().slice(0, 5),
-
-  timestamp: Date.now()
-},
-...prev
-]);
+    {
+      id: Date.now(),
+      categoria: categoriaDespesa,
+      nome: nomeDespesa,
+      valor: safeNumber(valorDespesa),
+      data: agora.toISOString().split("T")[0],
+      hora: agora.toTimeString().slice(0, 5),
+      timestamp: Date.now()
+    },
+    ...prev
+  ]);
 
   setNomeDespesa("");
   setValorDespesa("");
-  setCategoriaDespesa("Geral");
+  setCategoriaDespesa(""); // 👈 limpa pra forçar escolher de novo
 };
 
 
