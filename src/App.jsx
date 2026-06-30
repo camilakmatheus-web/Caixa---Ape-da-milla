@@ -852,11 +852,6 @@ setCaixa(0);
 
   // ===== BLOCO: ADICIONAR DESPESA =====
 
-if(!categoriaDespesa){
- alert("Selecione uma categoria");
- return;
-}
-
  const adicionarDespesa = () => {
 
   if (!categoriaDespesa || categoriaDespesa.trim() === "") {
