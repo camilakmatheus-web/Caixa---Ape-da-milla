@@ -416,7 +416,7 @@ const [categoriasDespesas, setCategoriasDespesas] = useState([]);
   const [pendentes, setPendentes] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [menuPagamento, setMenuPagamento] = useState(false);
-  const [clienteReajuste, setClienteReajuste] = useState(null);
+  
   
   // Bloqueio de quitação Total  //
 
