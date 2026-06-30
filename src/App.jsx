@@ -133,31 +133,7 @@ const [dataInicioStats, setDataInicioStats] = useState("");
 const [dataFimStats, setDataFimStats] = useState("");
 const [filtroStats, setFiltroStats] = useState(false);
 
-const vendasStats = vendas.filter(v => {
 
-  if (!filtroStats) return true;
-
-  const dataVenda = converterData(v.data);
-
-  if (!dataVenda) return false;
-
-  if (dataInicioStats) {
-    const inicio = converterData(dataInicioStats);
-    inicio.setHours(0,0,0,0);
-
-    if (dataVenda < inicio) return false;
-  }
-
-  if (dataFimStats) {
-    const fim = converterData(dataFimStats);
-    fim.setHours(23,59,59,999);
-
-    if (dataVenda > fim) return false;
-  }
-
-  return true;
-
-});
 
 
 
@@ -2189,6 +2165,32 @@ const filtrarVendas = () => {
     return true;
   });
 };
+
+const vendasStats = vendas.filter(v => {
+
+  if (!filtroStats) return true;
+
+  const dataVenda = converterData(v.data);
+
+  if (!dataVenda) return false;
+
+  if (dataInicioStats) {
+    const inicio = converterData(dataInicioStats);
+    inicio.setHours(0,0,0,0);
+
+    if (dataVenda < inicio) return false;
+  }
+
+  if (dataFimStats) {
+    const fim = converterData(dataFimStats);
+    fim.setHours(23,59,59,999);
+
+    if (dataVenda > fim) return false;
+  }
+
+  return true;
+
+});
 
 // ================= VENDAS: FILTRADAS =================
 // Resultado após aplicar filtro de período
