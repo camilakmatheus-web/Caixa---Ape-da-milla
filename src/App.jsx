@@ -1430,8 +1430,7 @@ useEffect(() => {
 useEffect(() => {
   if (!token || !firstLoadDone || !loaded) return;
 
-  // Evita salvar antes do primeiro carregamento
-  if (!consumos.length) return;
+  
 
   const timeout = setTimeout(() => {
     fetch(API + "/consumos", {
