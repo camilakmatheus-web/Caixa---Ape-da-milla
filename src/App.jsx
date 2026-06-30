@@ -471,8 +471,9 @@ const possuiQuitacaoParcial = possuiPendencias &&
   const [subTab, setSubTab] = useState("cadastro");
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
 
-  const [periodo, setPeriodo] = useState("7d");
+  
   const [filtroDataEstatistica, setFiltroDataEstatistica] = useState("");
+  const [periodo, setPeriodo] = useState("7d");
   const [caixa, setCaixa] = useState(0);
 
   const [ajusteAberto, setAjusteAberto] = useState(false);
