@@ -1,4 +1,4 @@
-         // ===== BLOCO: IMPORTAÇÕES =====
+        // ===== BLOCO: IMPORTAÇÕES =====
 // Importa Firebase (auth), bibliotecas externas e hooks do React
 
 import { auth, provider } from "./firebase";
@@ -104,6 +104,7 @@ const [estoqueIlimitadoTemp,
   const [openConsumo, setOpenConsumo] = useState(false);
   const [carrinhoConsumo, setCarrinhoConsumo] = useState([]);
   const [dataInicioConsumo, setDataInicioConsumo] = useState("");
+  const [buscaProduto, setBuscaProduto] = useState("");
   
 const [dataFimConsumo, setDataFimConsumo] = useState("");
 const [filtroAplicadoConsumo, setFiltroAplicadoConsumo] = useState(false);
@@ -400,7 +401,6 @@ return true;
   const [categoria, setCategoria] = useState("");
   const [categoriasProdutos, setCategoriasProdutos] = useState([]);
 const [categoriasDespesas, setCategoriasDespesas] = useState([]);
-const [buscaCategoriaProduto, setBuscaCategoriaProduto] = useState("");
   const [novaCategoria, setNovaCategoria] = useState("");
   const [vendas, setVendas] = useState([]);
   const [historicoClientes, setHistoricoClientes] = useState(() => {
@@ -1563,25 +1563,6 @@ const criarCategoriaDespesa = () => {
   setNovaCategoria("");
 
 };
-
-// ===== CATEGORIAS EM ORDEM ALFABÉTICA =====
-
-const categoriasProdutosOrdenadas = [...categoriasProdutos].sort(
-  (a, b) =>
-    a.nome.localeCompare(
-      b.nome,
-      "pt-BR",
-      { sensitivity: "base" }
-    )
-);
-
-const categoriasProdutosFiltradas =
-  categoriasProdutosOrdenadas.filter(cat =>
-    cat.nome
-      .toLowerCase()
-      .includes(buscaCategoriaProduto.toLowerCase())
-  );
-
   // ================= BLOCO: ADICIONAR PRODUTO NO CARRINHO =================
 // Adiciona um produto ao carrinho e reduz o estoque automaticamente
 
@@ -2684,46 +2665,6 @@ const baixarExtrato = () => {
   </div>
 
   {/* ================= CARDS DE CATEGORIA ================= */}
-
-<div
-  style={{
-    position: "relative",
-    marginBottom: 20
-  }}
->
-  <span
-    style={{
-      position: "absolute",
-      left: 14,
-      top: "50%",
-      transform: "translateY(-50%)",
-      fontSize: 18,
-      color: "#888",
-      pointerEvents: "none"
-    }}
-  >
-    🔍
-  </span>
-
-  <input
-    type="text"
-    placeholder="Pesquisar categoria..."
-    value={buscaCategoriaProduto}
-    onChange={(e) =>
-      setBuscaCategoriaProduto(e.target.value)
-    }
-    style={{
-      width: "100%",
-      padding: "12px 15px 12px 42px",
-      borderRadius: 12,
-      border: "1px solid #333",
-      background: "#111",
-      color: "#fff",
-      fontSize: 15,
-      outline: "none"
-    }}
-  />
-</div>
 
   <div
     style={{
@@ -4450,7 +4391,7 @@ fontSize:16
     Selecione uma categoria
   </option>
 
-  {categoriasProdutosFiltradas.map(cat => (
+  {categoriasProdutos.map(cat => (
   <option
     key={cat.id}
     value={cat.nome}
@@ -4796,13 +4737,15 @@ fontSize:16
 
       <div
         key={catObj.id}
-       onClick={() => {
+ onClick={() => {
 
   setCategoriaSelecionada(
     catObj.nome
   );
 
   setProdutoSelecionado(null);
+
+  setBuscaProduto("");
 
   setModalCategoria(true);
 
@@ -5488,6 +5431,65 @@ fontSize:16
 
          {/* PRODUTOS */}
 
+<div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 20,
+    background: "#181825",
+    border: "1px solid #333",
+    borderRadius: 12,
+    padding: "10px 15px"
+  }}
+>
+
+  <span style={{ fontSize: 18 }}>
+    🔍
+  </span>
+
+  <input
+    placeholder="Pesquisar produto..."
+    value={buscaProduto}
+    onChange={e =>
+      setBuscaProduto(e.target.value)
+    }
+    style={{
+      flex: 1,
+      background: "transparent",
+      border: "none",
+      outline: "none",
+      color: "#fff",
+      fontSize: 15
+    }}
+  />
+
+  <span
+    style={{
+      color: "#888",
+      fontSize: 13
+    }}
+  >
+    {
+      produtos
+        .filter(
+          p =>
+            p.categoria ===
+            categoriaSelecionada
+        )
+        .filter(
+          p =>
+            p.nome
+              .toLowerCase()
+              .includes(
+                buscaProduto.toLowerCase()
+              )
+        ).length
+    } produtos
+  </span>
+
+</div>
+
       <div
         style={{
           display:"grid",
@@ -5497,13 +5499,30 @@ fontSize:16
         }}
       >
 
-        {produtos
-          .filter(
-            p =>
-              p.categoria ===
-              categoriaSelecionada
-          )
-          .map(p => (
+     {produtos
+  .filter(
+    p =>
+      p.categoria ===
+      categoriaSelecionada
+  )
+
+  .filter(
+    p =>
+      p.nome
+        .toLowerCase()
+        .includes(
+          buscaProduto.toLowerCase()
+        )
+  )
+
+  .sort((a, b) =>
+    a.nome.localeCompare(
+      b.nome,
+      "pt-BR"
+    )
+  )
+
+  .map(p => (
 
            <div
   key={p.id}
