@@ -864,6 +864,13 @@ setCaixa(0);
     return;
   }
 
+  const valorNumerico = Number(valorDespesa);
+
+  if (isNaN(valorNumerico) || valorNumerico <= 0) {
+    alert("Por favor digite um valor válido");
+    return;
+  }
+
   const agora = new Date();
 
   setDespesas(prev => [
@@ -871,7 +878,7 @@ setCaixa(0);
       id: Date.now(),
       categoria: categoriaDespesa,
       nome: nomeDespesa,
-      valor: safeNumber(valorDespesa),
+      valor: valorNumerico, // 👈 agora seguro
       data: agora.toISOString().split("T")[0],
       hora: agora.toTimeString().slice(0, 5),
       timestamp: Date.now()
@@ -881,7 +888,7 @@ setCaixa(0);
 
   setNomeDespesa("");
   setValorDespesa("");
-  setCategoriaDespesa(""); // 👈 limpa pra forçar escolher de novo
+  setCategoriaDespesa("");
 };
 
 
