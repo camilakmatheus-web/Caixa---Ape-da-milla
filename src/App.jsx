@@ -2145,12 +2145,44 @@ const totalHoje = vendasHoje.reduce(
 
 // ================= FILTRO: PERÍODO DE VENDAS =================
 // Filtra vendas por período selecionado (hoje, 7d, 1m etc)
+// + filtro por intervalo de datas personalizado
 
 const filtrarVendas = () => {
   const hoje = new Date();
 
   return vendas.filter(v => {
+
     const dataVenda = dataParaDate(v.data);
+
+    // ================= FILTRO PERSONALIZADO =================
+
+    if (filtroStats) {
+
+      if (dataInicioStats) {
+
+        const inicio = converterData(dataInicioStats);
+        inicio.setHours(0, 0, 0, 0);
+
+        if (dataVenda < inicio) {
+          return false;
+        }
+
+      }
+
+      if (dataFimStats) {
+
+        const fim = converterData(dataFimStats);
+        fim.setHours(23, 59, 59, 999);
+
+        if (dataVenda > fim) {
+          return false;
+        }
+
+      }
+
+    }
+
+    // ================= FILTRO POR PERÍODO =================
 
     const diff =
       (hoje - dataVenda) / (1000 * 60 * 60 * 24);
@@ -2166,36 +2198,10 @@ const filtrarVendas = () => {
   });
 };
 
-const vendasStats = vendas.filter(v => {
-
-  if (!filtroStats) return true;
-
-  const dataVenda = converterData(v.data);
-
-  if (!dataVenda) return false;
-
-  if (dataInicioStats) {
-    const inicio = converterData(dataInicioStats);
-    inicio.setHours(0,0,0,0);
-
-    if (dataVenda < inicio) return false;
-  }
-
-  if (dataFimStats) {
-    const fim = converterData(dataFimStats);
-    fim.setHours(23,59,59,999);
-
-    if (dataVenda > fim) return false;
-  }
-
-  return true;
-
-});
-
 // ================= VENDAS: FILTRADAS =================
-// Resultado após aplicar filtro de período
-const vendasFiltradas = filtrarVendas();
+// Resultado após aplicar filtro
 
+const vendasFiltradas = filtrarVendas();
 
 
 // ================= FINANCEIRO: FATURAMENTO =================
@@ -2218,15 +2224,12 @@ const faturamento = vendasFiltradas
   );
 
 // ================= FINANCEIRO: CAIXA LÍQUIDO =================
-// Caixa final menos despesas
 
 const caixaLiquido =
   caixa - totalDespesas + ajusteCaixa;
 
 
-
 // ================= FINANCEIRO: LUCRO REAL =================
-// Lucro baseado em preço de venda vs custo
 
 const vendasPagas = vendasFiltradas.filter(v =>
   v.modo === "normal" ||
@@ -2234,7 +2237,6 @@ const vendasPagas = vendasFiltradas.filter(v =>
   v.modo === "pendente_pago_total" ||
   v.modo === "anotacao_paga"
 );
-
 
 const lucro = vendasPagas
   .filter(v => v.status !== "cancelada")
@@ -2264,16 +2266,17 @@ const lucro = vendasPagas
 
     const lucroVenda = (v.itens || []).reduce(
       (acc, item) => {
-const precoVenda = Number(
-  String(item.precoVenda || 0).replace(",", ".")
-);
 
-const precoCompra = Number(
-  String(item.preco || 0).replace(",", ".")
-);
+        const precoVenda = Number(
+          String(item.precoVenda || 0).replace(",", ".")
+        );
 
-const lucroUnit =
-  precoVenda - precoCompra;
+        const precoCompra = Number(
+          String(item.preco || 0).replace(",", ".")
+        );
+
+        const lucroUnit =
+          precoVenda - precoCompra;
 
         return acc + lucroUnit * (item.qtd || 1);
 
