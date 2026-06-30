@@ -400,6 +400,7 @@ return true;
   const [categoria, setCategoria] = useState("");
   const [categoriasProdutos, setCategoriasProdutos] = useState([]);
 const [categoriasDespesas, setCategoriasDespesas] = useState([]);
+const [buscaCategoriaProduto, setBuscaCategoriaProduto] = useState("");
   const [novaCategoria, setNovaCategoria] = useState("");
   const [vendas, setVendas] = useState([]);
   const [historicoClientes, setHistoricoClientes] = useState(() => {
@@ -1562,6 +1563,25 @@ const criarCategoriaDespesa = () => {
   setNovaCategoria("");
 
 };
+
+// ===== CATEGORIAS EM ORDEM ALFABÉTICA =====
+
+const categoriasProdutosOrdenadas = [...categoriasProdutos].sort(
+  (a, b) =>
+    a.nome.localeCompare(
+      b.nome,
+      "pt-BR",
+      { sensitivity: "base" }
+    )
+);
+
+const categoriasProdutosFiltradas =
+  categoriasProdutosOrdenadas.filter(cat =>
+    cat.nome
+      .toLowerCase()
+      .includes(buscaCategoriaProduto.toLowerCase())
+  );
+
   // ================= BLOCO: ADICIONAR PRODUTO NO CARRINHO =================
 // Adiciona um produto ao carrinho e reduz o estoque automaticamente
 
@@ -2664,6 +2684,46 @@ const baixarExtrato = () => {
   </div>
 
   {/* ================= CARDS DE CATEGORIA ================= */}
+
+<div
+  style={{
+    position: "relative",
+    marginBottom: 20
+  }}
+>
+  <span
+    style={{
+      position: "absolute",
+      left: 14,
+      top: "50%",
+      transform: "translateY(-50%)",
+      fontSize: 18,
+      color: "#888",
+      pointerEvents: "none"
+    }}
+  >
+    🔍
+  </span>
+
+  <input
+    type="text"
+    placeholder="Pesquisar categoria..."
+    value={buscaCategoriaProduto}
+    onChange={(e) =>
+      setBuscaCategoriaProduto(e.target.value)
+    }
+    style={{
+      width: "100%",
+      padding: "12px 15px 12px 42px",
+      borderRadius: 12,
+      border: "1px solid #333",
+      background: "#111",
+      color: "#fff",
+      fontSize: 15,
+      outline: "none"
+    }}
+  />
+</div>
 
   <div
     style={{
@@ -4390,7 +4450,7 @@ fontSize:16
     Selecione uma categoria
   </option>
 
-  {categoriasProdutos.map(cat => (
+  {categoriasProdutosFiltradas.map(cat => (
   <option
     key={cat.id}
     value={cat.nome}
