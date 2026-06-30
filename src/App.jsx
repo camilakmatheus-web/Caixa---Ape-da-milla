@@ -903,10 +903,62 @@ setCaixa(0);
 
   // ===== BLOCO: TOTAL DE DESPESAS =====
 
-  const totalDespesas = despesas.reduce(
-    (s, d) => s + d.valor,
-    0
-  );
+ const despesasFiltradasStats = despesas.filter(d => {
+
+  const dataDespesa = converterData(d.data);
+
+  if (!dataDespesa) return false;
+
+  // ================= FILTRO PERSONALIZADO =================
+
+  if (filtroStats) {
+
+    if (dataInicioStats) {
+
+      const inicio = converterData(dataInicioStats);
+      inicio.setHours(0, 0, 0, 0);
+
+      if (dataDespesa < inicio) {
+        return false;
+      }
+
+    }
+
+    if (dataFimStats) {
+
+      const fim = converterData(dataFimStats);
+      fim.setHours(23, 59, 59, 999);
+
+      if (dataDespesa > fim) {
+        return false;
+      }
+
+    }
+
+  }
+
+  // ================= FILTRO POR PERÍODO =================
+
+  const hoje = new Date();
+
+  const diff =
+    (hoje - dataDespesa) / (1000 * 60 * 60 * 24);
+
+  if (periodo === "hoje") return diff < 1;
+  if (periodo === "7d") return diff <= 7;
+  if (periodo === "14d") return diff <= 14;
+  if (periodo === "1m") return diff <= 30;
+  if (periodo === "3m") return diff <= 90;
+  if (periodo === "1y") return diff <= 365;
+
+  return true;
+
+});
+
+const totalDespesas = despesasFiltradasStats.reduce(
+  (s, d) => s + Number(d.valor || 0),
+  0
+);
 
 
 
