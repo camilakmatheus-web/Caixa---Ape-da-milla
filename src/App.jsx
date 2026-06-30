@@ -2195,7 +2195,7 @@ const vendasStats = vendas.filter(v => {
 // ================= VENDAS: FILTRADAS =================
 // Resultado após aplicar filtro de período
 const vendasFiltradas = filtrarVendas();
-const vendasFiltradas = vendasStats;
+
 
 
 // ================= FINANCEIRO: FATURAMENTO =================
