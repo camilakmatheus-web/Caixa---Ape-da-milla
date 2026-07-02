@@ -1798,7 +1798,7 @@ if (modoVenda === "anotacao") {
 
   const vendaAnotacao = {
     id: Date.now(),
-    itens: carrinho,
+    itens: carrinho.map(item => ({ ...item })),
     total: total,
     modo: "anotacao",
     data: dataAtual,
@@ -1890,7 +1890,7 @@ if (modoVenda === "anotacao") {
   pagamento: modoVenda === "normal" ? pagamento : null,
   modo: modoVenda,
   desconto: desconto || 0,
-  itens: carrinho,
+  itens: carrinho.map(item => ({ ...item })),
   total,
 
   data: agora.toLocaleDateString("pt-BR"),
@@ -1904,7 +1904,7 @@ if (modoVenda === "anotacao") {
   const anotacao = {
     id: timestamp,
     descricao: carrinho.map(i => i.nome).join(", "),
-    itens: carrinho,
+    itens: carrinho.map(item => ({ ...item })),
     valor: total,
     data: venda.data,
     hora: venda.hora,
