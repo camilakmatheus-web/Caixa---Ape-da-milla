@@ -1,4 +1,4 @@
-        // ===== BLOCO: IMPORTAÇÕES =====
+     // ===== BLOCO: IMPORTAÇÕES =====
 // Importa Firebase (auth), bibliotecas externas e hooks do React
 
 import { auth, provider } from "./firebase";
