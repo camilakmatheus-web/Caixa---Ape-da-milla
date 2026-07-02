@@ -403,6 +403,9 @@ return true;
 const [categoriasDespesas, setCategoriasDespesas] = useState([]);
   const [novaCategoria, setNovaCategoria] = useState("");
   const [vendas, setVendas] = useState([]);
+  
+
+
   const [historicoClientes, setHistoricoClientes] = useState(() => {
   return JSON.parse(
     localStorage.getItem("historicoClientes")
@@ -445,6 +448,7 @@ const possuiQuitacaoParcial = possuiPendencias &&
 
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState([]);
+ 
 
 
   // ===== BLOCO: VENDA (NÍVEL 3) =====
@@ -1054,7 +1058,7 @@ const topProdutos = useMemo(() => {
   const mapa = {};
 
   vendas
-    .filter(v => v.origem !== "quitacao" && v.status !== "cancelada") // 🔥 ignora canceladas
+    .filter(v => v.origem !== "quitacao" && v.status !== "cancelada")
     .forEach(v => {
 
       (v.itens || []).forEach(item => {
@@ -1062,13 +1066,16 @@ const topProdutos = useMemo(() => {
         const id = item.id;
         const qtd = item.qtd || 1;
 
-        mapa[id] = {
-  id,
-  nome: item.nome,
-  total: 0,
-  preco: item.precoVenda || 0,
-  custo: item.preco || 0
-};
+        // 🔥 CORREÇÃO AQUI
+        if (!mapa[id]) {
+          mapa[id] = {
+            id,
+            nome: item.nome,
+            total: 0,
+            preco: item.precoVenda || 0,
+            custo: item.preco || 0
+          };
+        }
 
         mapa[id].total += qtd;
 
@@ -1077,7 +1084,7 @@ const topProdutos = useMemo(() => {
     });
 
   return Object.values(mapa)
-  .sort((a, b) => b.total - a.total);
+    .sort((a, b) => b.total - a.total);
 
 }, [vendas]);
 
